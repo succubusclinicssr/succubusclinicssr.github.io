@@ -19,7 +19,7 @@ OFFLINE = os.environ.get("OFFLINE") == "1"   # 1 のとき YouTube へ取りに�
 # ---------------------------------------------------------------- イベントの基本情報（決まったら、ここだけ書き換えればサイト全体に反映されます）
 EVENT = "SuccubusClinic"                         # 短く書くときの名前
 EVENT_FULL = "SuccubusClinic -えすえすあーる-"     # 正式な名前（「えすえすあーる」はひらがなのまま）
-PUBLIC_URL = "https://succubusclinicssr.github.io/succubusclinic.github.io"  # 公開URL（GitHub Actions では環境変数 SITE_URL が優先されます）
+PUBLIC_URL = "https://succubusclinicssr.github.io"  # 公開URL（GitHub Actions では環境変数 SITE_URL が優先されます）
 GROUP_URL = "#"    # VRChat グループの URL（未定のあいだは "#"）
 X_URL = "#"        # 公式 X の URL（例 "https://x.com/xxxx"。未定のあいだは "#"）
 X_ID = ""          # 公式 X の ID（@ は付けない。未定のあいだは空 → 「準備中」と表示、twitter:site も出さない）

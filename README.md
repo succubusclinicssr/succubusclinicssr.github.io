@@ -1,7 +1,7 @@
 # SuccubusClinic -えすえすあーる- 公式サイト
 
 サキュバスたちがナースとして働くコンカフェ「SuccubusClinic」をテーマにした VRChat イベント「SuccubusClinic -えすえすあーる-」の公式サイトです。
-公開URL：https://succubusclinicssr.github.io/succubusclinic.github.io/
+公開URL：https://succubusclinicssr.github.io/
 キャスト・お知らせ・動画・集合写真は、**管理画面（/admin）から追加・編集**できます。保存すると数分で自動的にサイトへ反映されます。
 
 ```
