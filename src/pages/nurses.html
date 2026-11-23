@@ -4,7 +4,7 @@
     <div class="fx" data-fx="sub" aria-hidden="true"></div>
     <div class="inner">
       <p class="phead__lead rv" style="margin:0 auto 34rem;text-align:center">個性ゆたかなサキュバスのナースたちが、患者さまをお出迎えします♡<br>カードを押すと、カルテ（プロフィール）が見られます。</p>
-      <div class="tabs ctabs rv" id="cast-tabs" role="tablist" aria-label="期生で絞り込む">{{CASTTABS}}</div>
+      {{CASTTABS}}
       <div class="ctool glass rv">
         <label class="ctool__search"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L18 18"/></svg><input type="search" id="cast-q" placeholder="名前でさがす" aria-label="ナースを名前でさがす" autocomplete="off"></label>
         <p class="ctool__count mono"><b id="cast-count">{{CASTN}}</b> / {{CASTN}} NURSES</p>
@@ -44,7 +44,7 @@
       <p class="cm-catch" id="cm-catch"></p>
       <h2 class="cm-name" id="cm-name"></h2>
       <p class="cm-tags" id="cm-tags"></p>
-      <dl class="spec cm-spec" id="cm-spec"></dl>
+      <div class="km" id="cm-spec" role="list" aria-label="カルテの4項目" hidden></div>
       <p class="cm-empty" id="cm-empty" hidden>カルテは準備中です。公開まで、もう少しお待ちください♡</p>
       <div class="cm-nav">
         <button class="arr" type="button" id="cm-prev" aria-label="前のナース"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L5 7l4 4"/></svg></button>

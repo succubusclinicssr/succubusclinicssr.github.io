@@ -1046,8 +1046,6 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
 .cm-no { font-size: 12rem; color: var(--ink-2); }
 .cm-name { margin-top: 10rem; font-weight: 900; font-size: 44rem; line-height: 1.25; letter-spacing: .03em; word-break: break-all; }
 
-.cmodal__info .spec { margin-top: 22rem; border-top: 1px solid var(--hair); }
-.cmodal__info .spec div:last-child { border-bottom: 1px solid var(--hair); }
 .cm-nav { margin-top: auto; padding-top: 26rem; display: flex; align-items: center; justify-content: space-between; gap: 12rem; }
 .cm-nav span { font-size: 13rem; color: var(--ink-2); }
 .cm-nav .arr { display: grid; place-items: center; width: 48rem; height: 48rem; border-radius: 50%; border: 1px solid var(--ink); transition: background .4s, color .4s; }
@@ -1071,7 +1069,6 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
   .cmodal__ph { aspect-ratio: auto; height: 50vh; max-height: none; }
   .cmodal__info { padding: 22rem 22rem 20rem; }
   .cm-name { font-size: 28rem; }
-  .cmodal__info .spec { margin-top: 14rem; }
   .cm-nav { padding-top: 16rem; }
 }
 
@@ -1085,14 +1082,11 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
 .cm-catch:empty { display: none; }
 .cmodal__info .cm-name { margin-top: 4rem; }
 .cm-tags { margin-top: 12rem; display: flex; flex-wrap: wrap; gap: 6rem; }
+.cm-tags:empty { display: none; }
 .cm-tags span { padding: 2rem 12rem; border-radius: 999px; background: #ffd6ea; color: #c4417d; font-weight: 800; font-size: 12rem; }
 .cm-tags span.--lead { background: #ffe58a; color: #8a6200; }
 .cm-tags span.--gen { background: var(--gc); color: #fff; }
 .cm-tags span.--type { background: var(--grad); color: #fff; box-shadow: 0 4rem 10rem -6rem rgba(214,166,242,.9); }
-.cmodal__info .cm-spec { margin-top: 18rem; }
-.cmodal__info .cm-spec div { grid-template-columns: 96rem minmax(0, 1fr); padding: 10rem 0; }
-.cmodal__info .cm-spec dt { font-family: var(--f-jp); font-weight: 800; font-size: 12rem; letter-spacing: .08em; color: var(--pink-d); }
-.cmodal__info .cm-spec dd { font-size: 14rem; line-height: 1.6; }
 .cm-empty { margin-top: 22rem; padding: 18rem 20rem; border-radius: 18rem; background: var(--pink-l); color: var(--ink-2); font-size: 14rem; }
 .cmodal__info { overflow-y: auto; }
 @media (max-width: 768px) {
@@ -1100,9 +1094,32 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
   .ccard__gen { right: 6rem; top: 6rem; font-size: 9rem; padding: 0 7rem; }
   .ccard__catch { font-size: 10rem; }
   .cm-catch { font-size: 12rem; }
-  .cmodal__info .cm-spec div { grid-template-columns: 80rem minmax(0, 1fr); padding: 8rem 0; }
-  .cmodal__info .cm-spec dd { font-size: 13rem; }
   .cmodal__ph { height: 42vh; }
+}
+/* カルテの4項目メーター（お話し・甘さ・刺激・距離を 1〜10 の10区画バーで。色はナースのイメージカラー --c／--c2 にサイトのピンク〜ラベンダーを混ぜる） */
+.km { --km-a: color-mix(in srgb, var(--c, #ffb3d4) 40%, #ff8fc0); --km-b: color-mix(in srgb, var(--c2, var(--c, #d6a6f2)) 45%, #b47ce6); --km-off: color-mix(in srgb, var(--c, #ffe3ef) 22%, #f4eff7);
+  display: grid; gap: 12rem; margin-top: 20rem; padding: 14rem 0 4rem; border-top: 1px solid var(--hair); }
+.km[hidden] { display: none; }
+.km__sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+.km__item { display: grid; grid-template-columns: 58rem minmax(0, 1fr) 46rem; grid-template-areas: "k bar n" ". ends ."; column-gap: 12rem; row-gap: 5rem; align-items: center; }
+.km__k { grid-area: k; font-weight: 700; font-size: 13rem; line-height: 1.3; letter-spacing: .06em; color: var(--ink); }
+.km__n { grid-area: n; justify-self: end; font-family: var(--f-head); font-weight: 900; font-size: 26rem; line-height: 1; letter-spacing: 0; color: var(--ink); }
+.km__bar { grid-area: bar; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3rem; height: 14rem; }
+.km__bar i { --i: 0; border-radius: 3rem; background: var(--km-off); }
+.km__bar i:first-child { border-radius: 7rem 3rem 3rem 7rem; }
+.km__bar i:last-child { border-radius: 3rem 7rem 7rem 3rem; }
+/* 塗った区画は、バー全体で1本のグラデーションに見えるよう背景の位置をずらす */
+.km__bar i.on { background: linear-gradient(90deg, var(--km-a), var(--km-b)); background-size: 1000% 100%; background-position: calc(var(--i) / 9 * 100%) 0;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); transform-origin: 0 50%; animation: kmCell .32s var(--ease) both; animation-delay: calc(var(--i) * 45ms + 120ms); }
+.km__ends { grid-area: ends; display: flex; justify-content: space-between; gap: 8rem; margin-top: -1rem; }
+.km__end { font-size: 11rem; line-height: 1.3; letter-spacing: .04em; color: var(--ink-2); white-space: nowrap; }
+@keyframes kmCell { from { opacity: 0; transform: scaleX(.2); } }
+@media (prefers-reduced-motion: reduce) { .km__bar i.on { animation: none; } }
+@media (max-width: 768px) {
+  .km { gap: 10rem; margin-top: 14rem; padding-top: 12rem; }
+  .km__item { grid-template-columns: 52rem minmax(0, 1fr) 38rem; column-gap: 10rem; }
+  .km__n { font-size: 23rem; }
+  .km__bar { height: 13rem; gap: 2.5rem; }
 }
 /* 9期生・10期生、4ステップの流れ、プロフィール公開後のバー */
 .g9 { --gc: #8f9cf2; } .g10 { --gc: #36c2c8; }

@@ -449,20 +449,38 @@ document.documentElement.classList.add("js");
       var b = e.target.closest("button"); if (!b) return; curGen = b.dataset.gen;
       [].forEach.call(ctabs.children, function (t) { t.setAttribute("aria-selected", t === b); }); applyFilter();
     });
-    var row = function (k, v) { return "<div><dt>" + k + "</dt><dd>" + esc(v) + "</dd></div>"; };
+    // カルテの4項目メーター（数字が大きいほど右＝10側の意味）。4つの値がそろっていないときは "" を返す
+    var KM = [
+      { key: "talk", name: "お話し", lo: "聞き役", hi: "おしゃべり" },
+      { key: "sweet", name: "甘さ", lo: "クール", hi: "あまあま" },
+      { key: "spice", name: "刺激", lo: "おだやか", hi: "ドキドキ" },
+      { key: "dist", name: "距離", lo: "ひかえめ", hi: "ぐっと近い" }
+    ];
+    var kmRender = function (p) {
+      var vals = KM.map(function (it) { var v = Number(p && p[it.key]); return v >= 1 && v <= 10 && Math.round(v) === v ? v : 0; });
+      if (vals.indexOf(0) > -1) return "";
+      return KM.map(function (it, k) {
+        var v = vals[k], cells = "";
+        for (var i = 0; i < 10; i++) cells += '<i style="--i:' + i + '"' + (i < v ? ' class="on"' : "") + "></i>";
+        return '<div class="km__item" role="listitem"><span class="km__sr">' + it.name + " 10段階中" + v + "。1は" + it.lo + "、10は" + it.hi + "</span>" +
+          '<span class="km__k" aria-hidden="true">' + it.name + '</span><span class="km__bar" aria-hidden="true">' + cells + '</span><span class="km__n" aria-hidden="true">' + v + "</span>" +
+          '<span class="km__ends" aria-hidden="true"><span class="km__end">' + it.lo + '</span><span class="km__end">' + it.hi + "</span></span></div>";
+      }).join("");
+    };
     var cmShow = function (card) {
       var list = shown(), d = card.dataset, p = PROF[d.id]; cmIdx = list.indexOf(card);
       cmBox.style.setProperty("--c", card.style.getPropertyValue("--c"));
+      cmBox.style.setProperty("--c2", card.style.getPropertyValue("--c2"));
       cmWant = d.id; cmImg.src = "img/cast/s/" + d.id + ".webp"; cmImg.alt = d.name;
       var big = new Image(); big.onload = function () { if (cmWant === d.id) cmImg.src = big.src; }; big.src = "img/cast/" + d.id + ".webp";
       $("cm-name").textContent = d.name; $("cm-no").textContent = "No." + d.no;
       $("cm-catch").textContent = p ? p.catch : "";
-      // 役職（院長・婦長・主任）→ ナースの種類（期生ごと）→ 担当（シンガーなど）→ 期生
+      // 役職（院長・婦長・主任）→ ナースの種類（期生ごと）→ 担当（シンガーなど）→ 期生（期生があるときだけ）。何も無ければ行ごと消える（.cm-tags:empty）
       var lead = p ? p.roles.filter(function (r) { return /院長|婦長|主任/.test(r); }) : [], rest = p ? p.roles.filter(function (r) { return !/院長|婦長|主任/.test(r); }) : [];
       $("cm-tags").innerHTML = p ? lead.map(function (r) { return '<span class="--lead">' + esc(r) + "</span>"; }).join("") + (p.type ? '<span class="--type">' + esc(p.type) + "</span>" : "") +
-        rest.map(function (r) { return "<span>" + esc(r) + "</span>"; }).join("") + '<span class="--gen g' + p.gen + '">' + p.gen + "期生</span>" : '<span class="--gen g0">カルテ準備中</span>';
-      $("cm-spec").innerHTML = p ? row("生年月日", p.bday) + row("出身", p.from) + row("血液型", p.blood) + row("好物", p.likes) + row("得意な処置", p.skill) : "";
-      $("cm-spec").hidden = !p; $("cm-empty").hidden = !!p;
+        rest.map(function (r) { return "<span>" + esc(r) + "</span>"; }).join("") + (p.gen > 0 ? '<span class="--gen g' + p.gen + '">' + p.gen + "期生</span>" : "") : '<span class="--gen g0">カルテ準備中</span>';
+      var km = kmRender(p);
+      $("cm-spec").innerHTML = km; $("cm-spec").hidden = !km; $("cm-empty").hidden = !!p;
       $("cm-pos").textContent = pad(cmIdx + 1) + " / " + pad(list.length);
     };
     var cmClose = function () { if (cm.hidden) return; cm.hidden = true; document.body.style.overflow = ""; if (cmLast) cmLast.focus(); };

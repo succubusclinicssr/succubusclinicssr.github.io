@@ -134,6 +134,13 @@ def maid_types():
     except Exception as e: warn(f"ナースの種類の設定を読めませんでした（{e}）"); rows = []
     return {int(num(r.get("gen"), 0)): str(r.get("name") or "").strip() for r in rows if r.get("name")}
 TYPES = {}
+METER = ("talk", "sweet", "spice", "dist")    # カルテの4項目：お話し・甘さ・刺激・距離
+def meter_val(v):
+    """1〜10 の整数ならその数、それ以外（""・None・範囲外・小数・文字）は None"""
+    if isinstance(v, bool): return None
+    try: f = float(str(v).strip())
+    except (TypeError, ValueError): return None
+    return int(f) if f.is_integer() and 1 <= f <= 10 else None
 def build_cast():
     TYPES.update(maid_types())
     rows = []
@@ -147,10 +154,14 @@ def build_cast():
         if not (re.fullmatch(r"#[0-9a-fA-F]{6}", c) and re.fullmatch(r"#[0-9a-fA-F]{6}", c2)):
             ac, ac2 = auto_colors(src); c = c if re.fullmatch(r"#[0-9a-fA-F]{6}", c) else ac; c2 = c2 if re.fullmatch(r"#[0-9a-fA-F]{6}", c2) else ac2
         gen = int(num(d.get("gen"), 0)); roles = [r for r in (d.get("roles") or []) if r]
+        # カルテの4項目（1〜10 の整数。空・範囲外・数字でないものは未入力＝None）
+        meter = {k: meter_val(d.get(k)) for k in METER}
+        catch = str(d.get("catch") or "").strip()
         p = None
-        if gen > 0:
-            p = {k: str(d.get(k) or "") for k in ("card", "catch", "bday", "from", "blood", "likes", "skill")}
-            p.update(gen=gen, roles=roles, type=TYPES.get(gen) or "ナース")
+        # カルテあり：期生がある、またはキャッチコピーがある、または4項目がそろっている
+        if gen > 0 or catch or all(v is not None for v in meter.values()):
+            p = {"card": str(d.get("card") or ""), "catch": catch}
+            p.update(gen=gen, roles=roles, type=(TYPES.get(gen) or "ナース") if gen > 0 else "", **meter)
             if not p["card"]: p["card"] = d["name"]
         rank = min([RANK.index(r) for r in roles if r in RANK] or [len(RANK)])
         rows.append(((gen or 99), rank, num(d.get("order"), 9999), d["name"], {"id": cid, "name": d["name"].strip(), "c": c.lower(), "c2": c2.lower(), "p": p}))
@@ -429,8 +440,9 @@ def cast_list(CAST):
     out = []
     for k, c in enumerate(CAST, 1):
         n = esc(c["name"]); p = c.get("p")
-        gen = str(p["gen"]) if p else "0"
-        chip = f'<span class="ccard__gen g{gen}">{gen}期生</span>' if p else '<span class="ccard__gen g0">準備中</span>'
+        # data-gen：期生（1〜）、カルテ準備中は "0"、カルテありで期生なしは ""（どの期生タブにも入らない）
+        gen = (str(p["gen"]) if p["gen"] > 0 else "") if p else "0"
+        chip = (f'<span class="ccard__gen g{gen}">{gen}期生</span>' if gen else '') if p else '<span class="ccard__gen g0">準備中</span>'
         catch = f'<span class="ccard__catch">{esc(p["catch"])}</span>' if p and p["catch"] else ''
         out.append(f'        <li class="ccard rv" data-id="{c["id"]}" data-name="{n}" data-gen="{gen}" data-no="{k:02d}" style="--c:{c["c"]};--c2:{c["c2"]}"><button class="ccard__btn" type="button" aria-label="{n}のカルテを見る">'
                    f'<span class="ccard__ph"><img src="img/cast/s/{c["id"]}.webp" alt="{n}" width="400" height="601" loading="lazy" decoding="async">{chip}</span>'
@@ -442,12 +454,15 @@ def cast_data(CAST):
     return '<script type="application/json" id="cast-data">' + json.dumps(d, ensure_ascii=False).replace("</", "<\\/") + '</script>'
 
 def cast_tabs(CAST):
-    gens = sorted({c["p"]["gen"] for c in CAST if c.get("p")})
-    cnt = lambda g: sum(1 for c in CAST if (c["p"]["gen"] if c.get("p") else 0) == g)
-    b = [f'<button type="button" role="tab" data-gen="all" aria-selected="true">すべて<small>{len(CAST)}</small></button>']
-    b += [f'<button type="button" role="tab" data-gen="{g}" aria-selected="false">{g}期生<small>{cnt(g)}</small></button>' for g in gens]
-    if cnt(0): b.append(f'<button type="button" role="tab" data-gen="0" aria-selected="false">カルテ準備中<small>{cnt(0)}</small></button>')
-    return "".join(b)
+    """絞り込みタブ：すべて＋期生（1〜）＋カルテ準備中。「すべて」しか無いときはタブの列ごと出さない"""
+    gens = sorted({c["p"]["gen"] for c in CAST if c.get("p") and c["p"]["gen"] > 0})
+    cnt = lambda g: sum(1 for c in CAST if c.get("p") and c["p"]["gen"] == g)
+    none = sum(1 for c in CAST if not c.get("p"))
+    b = [f'<button type="button" role="tab" data-gen="{g}" aria-selected="false">{g}期生<small>{cnt(g)}</small></button>' for g in gens]
+    if none: b.append(f'<button type="button" role="tab" data-gen="0" aria-selected="false">カルテ準備中<small>{none}</small></button>')
+    if not b: return ""
+    b.insert(0, f'<button type="button" role="tab" data-gen="all" aria-selected="true">すべて<small>{len(CAST)}</small></button>')
+    return '<div class="tabs ctabs rv" id="cast-tabs" role="tablist" aria-label="期生で絞り込む">' + "".join(b) + "</div>"
 
 MOVIE_TAGS = [("short", "ショート"), ("pv", "PV"), ("live", "配信"), ("cover", "歌ってみた")]
 def movie_tabs(MOVIES):

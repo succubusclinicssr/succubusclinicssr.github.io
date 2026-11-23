@@ -117,7 +117,7 @@ collections:
       - { name: name, label: 名前, widget: string }
       - { name: show, label: サイトに表示する, widget: boolean, default: true, hint: 卒業・お休みのときにオフにすると、データを残したまま非表示にできます }
       - { name: image, label: 立ち絵, widget: image, hint: "背景を透過したPNG（縦長 2:3、例 1023×1537）がおすすめ。サイズは自動で調整されます" }
-      - { name: gen, label: 期生, widget: number, value_type: int, min: 0, default: 1, hint: "ナースの種類（1期生＝ナース など）は期生から自動で決まります。0 にすると「カルテ準備中」" }
+      - { name: gen, label: 期生, widget: number, value_type: int, min: 0, default: 1, hint: "ナースの種類（1期生＝ナース など）は期生から自動で決まります。0 でも、キャッチコピーか4項目を入れればカルテが出ます" }
       - name: roles
         label: 役職・担当
         widget: select
@@ -127,11 +127,10 @@ collections:
         options: [院長, 婦長, 主任, シンガー, サブシンガー, ダンサー]
       - { name: card, label: ローマ字表記, widget: string, required: false, hint: カルテに入る名前（空なら名前をそのまま使います） }
       - { name: catch, label: キャッチコピー, widget: string, required: false }
-      - { name: bday, label: 生年月日（カルテ）, widget: string, required: false, hint: 例 2月4日 }
-      - { name: from, label: 出身（カルテ）, widget: string, required: false }
-      - { name: blood, label: 血液型（カルテ）, widget: string, required: false }
-      - { name: likes, label: 好物（カルテ）, widget: string, required: false }
-      - { name: skill, label: 得意な処置（カルテ：特技）, widget: string, required: false }
+      - { name: talk, label: お話し（1〜10）, widget: number, value_type: int, min: 1, max: 10, required: false, hint: "1＝聞き役・おっとり ／ 10＝おしゃべり大好き" }
+      - { name: sweet, label: 甘さ（1〜10）, widget: number, value_type: int, min: 1, max: 10, required: false, hint: "1＝クール・さっぱり ／ 10＝あまあま" }
+      - { name: spice, label: 刺激（1〜10）, widget: number, value_type: int, min: 1, max: 10, required: false, hint: "1＝おだやか・癒やし ／ 10＝小悪魔・ドキドキ" }
+      - { name: dist, label: 距離（1〜10）, widget: number, value_type: int, min: 1, max: 10, required: false, hint: "1＝ひかえめ・遠め ／ 10＝ぐっと近い（4項目そろうとカルテにメーターが出ます）" }
       - { name: color, label: イメージカラー（うすい色）, widget: color, required: false, hint: 空なら立ち絵から自動で決まります }
       - { name: color2, label: イメージカラー（こい色）, widget: color, required: false, hint: 空なら立ち絵から自動で決まります }
       - { name: order, label: 並び順, widget: number, value_type: int, required: false, default: 9999, hint: 同じ期生・同じ役職のなかで、小さい数字ほど前に並びます }
