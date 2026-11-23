@@ -2613,3 +2613,215 @@ a.qrow:hover .qrow__title { color: var(--pink-d); }
 .cmodal__info { background: #fff linear-gradient(90deg, transparent 26rem, rgba(249,83,194,.28) 26rem 27.5rem, transparent 27.5rem); }
 .cm-no { align-self: flex-start; padding: 2rem 12rem; border: 2px solid color-mix(in srgb, var(--c2, var(--neon-p)) 78%, #2a1f4a); border-radius: 8rem; background: var(--c, #fff4fb); color: var(--ink); font-weight: 700; }
 @media (max-width: 768px) { .cmodal__box { border-top-width: 6rem; } .cmodal__info { background: #fff; } }
+
+/* =====================================================================
+   サイバーパンク寄りの手直し：「白いタイル張りの夜間診療所に、ネオン看板と配線が後付けされている」
+   1. 英字の大見出し＝タイル壁に取り付けたネオン管の看板（濃い板・ビス・電源ケーブル）
+      管の色：大見出し（NEWS・ABOUT など各コーナー／各ページの見出し）はピンク、小見出し（GALLERY・FAQ など）はシアン
+   2. 背景の飾り＝壁に後付けされたケーブル・警告ラベル・バーコード・ステッカー（計器に見える HUD はやめた）
+   3. トップの「診療中」ネオン看板（状態は site.js）
+   6. ロゴと見出しのグリッチ（ごくたまに。1つずつ時間をずらす）、ボタンとナビに触れたときの一瞬のグリッチ
+   8. 角を斜めに切った枠（右上と左下）。紙もの（問診表の用紙・カルテ）は対象外
+   ===================================================================== */
+
+/* ---------- 1. 見出しユニット：線の枠（面取り・段差・二重線）に、ネオン色の塗り文字。左に斜めストライプ、右へ引き出し線と丸、その先に日本語の副題 ----------
+   文字の色：大見出しはピンク、小見出し（GALLERY・FAQ など）はシアン。枠の内側はごく薄い白で、心電図が文字を横切らないようにする */
+.sec-head__en, .phead__en, .sub-h b, .faq__label b,
+.sec-head__en.grad-text, .phead__en.grad-text, .sub-h b.grad-text, .faq__label b.grad-text {
+  --tc: var(--pink-h); --tube: 0 0 6rem rgba(249,83,194,.32);
+  position: relative; display: inline-block; padding: .2em .34em .17em calc(.34em + 22rem); border: 2px solid transparent; border-radius: 0;
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='80' viewBox='0 0 240 80'%3E %3Cpath d='M12 1H200l6 6h33v61l-12 11H1V13z' fill='%23fff' fill-opacity='.84' stroke='%232a1f4a' stroke-width='2'/%3E %3Cpath d='M15 5h183l6 6h31v55l-10 9H5V15z' fill='none' stroke='%232a1f4a' stroke-opacity='.35'/%3E %3Cpath d='M16 1h20' stroke='%23f953c2' stroke-width='4'/%3E %3Cpath d='M8 70h6M8 66h3M8 62h3' stroke='%232a1f4a' stroke-width='1.5'/%3E %3Cpath d='M228 74l8-8' stroke='%23f953c2' stroke-width='2'/%3E%3C/svg%3E") 18 46 18 40 fill / 18rem 46rem 18rem 40rem stretch;
+  background: none; -webkit-background-clip: border-box; background-clip: border-box; box-shadow: none; filter: none;
+  color: var(--tc); -webkit-text-fill-color: currentColor; text-shadow: var(--tube); }
+.sub-h b, .faq__label b, .sub-h b.grad-text, .faq__label b.grad-text { --tc: var(--sky-h); --tube: 0 0 5rem rgba(0,171,252,.3);
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='80' viewBox='0 0 240 80'%3E %3Cpath d='M12 1H200l6 6h33v61l-12 11H1V13z' fill='%23fff' fill-opacity='.84' stroke='%232a1f4a' stroke-width='2'/%3E %3Cpath d='M15 5h183l6 6h31v55l-10 9H5V15z' fill='none' stroke='%232a1f4a' stroke-opacity='.35'/%3E %3Cpath d='M16 1h20' stroke='%2300abfc' stroke-width='4'/%3E %3Cpath d='M8 70h6M8 66h3M8 62h3' stroke='%232a1f4a' stroke-width='1.5'/%3E %3Cpath d='M228 74l8-8' stroke='%2300abfc' stroke-width='2'/%3E%3C/svg%3E") 18 46 18 40 fill / 14rem 34rem 14rem 30rem stretch; padding-left: calc(.34em + 16rem); }
+/* 左の斜めストライプの小ブロック */
+.sec-head__en::before, .phead__en::before, .sub-h b::before, .faq__label b::before { content: ""; position: absolute; left: 14rem; top: 26%; bottom: 26%; width: 12rem;
+  background: repeating-linear-gradient(-45deg, var(--ink) 0 2.5rem, transparent 2.5rem 5rem); }
+.sub-h b::before, .faq__label b::before { left: 10rem; width: 9rem; }
+.sec-head__en::after, .phead__en::after { content: none; }
+/* 右へ伸びる引き出し線（45°に折れて先端に丸）→ その先に副題 */
+.sec-head, .phead__row { align-items: center; }
+.sec-head__line, .phead__line { order: 1; flex: none; width: 96rem; min-width: 0; height: 30rem; margin: 0 -8rem 0 0; border-radius: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='30' viewBox='0 0 96 30'%3E %3Cpath d='M0 6h34l18 18h32' fill='none' stroke='%232a1f4a' stroke-width='2'/%3E %3Ccircle cx='89' cy='24' r='4.5' fill='%23f953c2' stroke='%232a1f4a' stroke-width='1.5'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+.sec-head__side, .phead__side { order: 2; padding-bottom: 0; }
+.sec-head__jp, .phead__jp { color: var(--ink); }
+.sub-h span, .faq__label span { color: var(--ink); }
+@media (max-width: 768px) {
+  .sec-head__en, .phead__en { border-image-width: 12rem 30rem 12rem 26rem; padding-left: calc(.34em + 16rem); }
+  /* 枠とストライプのぶん、長い英字が画面からはみ出さないよう文字を少し小さく */
+  .sec-head__en, .phead__en { font-size: min(56rem, calc(280rem / (var(--len, 8) * .78))); }
+  .sec-head__en::before, .phead__en::before { left: 9rem; width: 8rem; }
+  .sec-head__line, .phead__line { display: none; }
+}
+
+/* グリッチ（10 秒に1回・0.25 秒ほどピンクとシアンにずれる）。開始時刻は site.js が 1 つずつずらす（--gdl）。管の瞬きはやめた */
+.js .sec-head__en, .js .phead__en, .js .sub-h b, .js .faq__label b { animation: neonLife 10s var(--gdl, 0s) infinite steps(1, end); }
+@keyframes neonLife {
+  0% { transform: none; clip-path: none; text-shadow: var(--tube); }
+  96.4% { transform: translateX(5rem) skewX(-8deg); text-shadow: -5rem 0 rgba(0,171,252,.9), 5rem 0 rgba(249,83,194,.9); }
+  97.2% { transform: translateX(-4rem); clip-path: inset(28% 0 22% 0); text-shadow: 4rem 0 rgba(0,171,252,.9), -4rem 0 rgba(249,83,194,.9); }
+  98.1% { transform: translateX(2rem); clip-path: none; text-shadow: var(--tube); }
+  98.9%, 100% { transform: none; clip-path: none; text-shadow: var(--tube); }
+}
+/* ロゴのグリッチ（画像なので、影の色ずれと横ずれで） */
+.h-logo img, .f-logo img { filter: none; }
+.js .h-logo img, .js .f-logo img { animation: logoGlitch 10s var(--gdl, 0s) infinite steps(1, end); }
+@keyframes logoGlitch {
+  0% { translate: 0 0; filter: none; clip-path: none; }
+  96.4% { translate: 4rem 0; filter: drop-shadow(-4rem 0 rgba(0,171,252,.9)) drop-shadow(4rem 0 rgba(249,83,194,.9)); }
+  97.3% { translate: -3rem 0; clip-path: inset(18% 0 38% 0); }
+  98.1% { translate: 1rem 0; clip-path: none; filter: drop-shadow(3rem 0 rgba(0,171,252,.8)); }
+  98.9%, 100% { translate: 0 0; filter: none; clip-path: none; }
+}
+/* ボタン・ナビに触れたときだけ、一瞬のグリッチ */
+.btn:hover span, .btn:focus-visible span, .gnav a:hover, .gnav a:focus-visible, .h-join:hover, .h-join:focus-visible, .sp-link:hover, .sp-link:focus-visible { animation: tapGlitch .28s steps(1, end) 1; }
+@keyframes tapGlitch {
+  0% { translate: 2rem 0; text-shadow: -2rem 0 rgba(0,171,252,.9), 2rem 0 rgba(249,83,194,.9); }
+  35% { translate: -2rem 0; text-shadow: 2rem 0 rgba(0,171,252,.9), -2rem 0 rgba(249,83,194,.9); }
+  70%, 100% { translate: 0 0; }
+}
+
+/* ---------- 2. 壁の飾り：基板の配線・照準・目盛り・警告ラベル（PC の左右の余白だけ。画面に固定） ---------- */
+.wall { --t: 64rem; position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.wall > * { position: absolute; display: block; background-repeat: no-repeat; background-size: 100% 100%; }
+.wall__circuit { left: 6rem; top: calc(var(--t) * 1 + 8rem); width: 52rem; height: 300rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='300' viewBox='0 0 52 300'%3E %3Cg fill='none' stroke='%232a1f4a' stroke-opacity='.55' stroke-width='1.5'%3E %3Cpath d='M8 0v70l16 16v70l-12 12v60'/%3E%3Cpath d='M22 0v36l14 14v52'/%3E%3Cpath d='M4 300v-38l10-10'/%3E%3C/g%3E %3Cpath d='M44 300v-90l-14-14v-40' fill='none' stroke='%2300abfc' stroke-width='1.5'/%3E %3Crect x='17' y='176' width='22' height='22' fill='%23fff' stroke='%232a1f4a' stroke-opacity='.6' stroke-width='1.5'/%3E %3Crect x='23' y='182' width='10' height='10' fill='%232a1f4a' fill-opacity='.5'/%3E %3Cg fill='%23fff' stroke='%232a1f4a' stroke-width='1.5'%3E%3Ccircle cx='12' cy='232' r='3.5'/%3E%3Ccircle cx='36' cy='106' r='3.5'/%3E%3Ccircle cx='14' cy='252' r='3.5'/%3E%3C/g%3E %3Ccircle cx='30' cy='154' r='3.5' fill='%23fff' stroke='%2300abfc' stroke-width='1.5'/%3E%3C/svg%3E"); }
+.wall__reticle { right: 12rem; top: calc(var(--t) * 11 + 20rem); width: 50rem; height: 50rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E %3Cg fill='none' stroke='%232a1f4a' stroke-opacity='.6' stroke-width='1.5'%3E %3Ccircle cx='28' cy='28' r='20'/%3E%3Cpath d='M28 2v12M28 42v12M2 28h12M42 28h12'/%3E%3C/g%3E %3Ccircle cx='28' cy='28' r='13' fill='none' stroke='%232a1f4a' stroke-opacity='.3' stroke-dasharray='3 4'/%3E %3Ccircle cx='28' cy='28' r='4' fill='%23f953c2'/%3E%3C/svg%3E"); }
+.wall__ruler { right: 22rem; top: calc(var(--t) * 3 + 30rem); width: 24rem; height: 226rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='226' viewBox='0 0 24 226'%3E %3Cg fill='none' stroke='%232a1f4a' stroke-opacity='.55' stroke-width='1.5'%3E%3Cpath d='M18 0v226'/%3E%3Cpath d='M4 6h14'/%3E%3Cpath d='M12 16h6'/%3E%3Cpath d='M12 26h6'/%3E%3Cpath d='M12 36h6'/%3E%3Cpath d='M12 46h6'/%3E%3Cpath d='M4 56h14'/%3E%3Cpath d='M12 66h6'/%3E%3Cpath d='M12 76h6'/%3E%3Cpath d='M12 86h6'/%3E%3Cpath d='M12 96h6'/%3E%3Cpath d='M4 106h14'/%3E%3Cpath d='M12 116h6'/%3E%3Cpath d='M12 126h6'/%3E%3Cpath d='M12 136h6'/%3E%3Cpath d='M12 146h6'/%3E%3Cpath d='M4 156h14'/%3E%3Cpath d='M12 166h6'/%3E%3Cpath d='M12 176h6'/%3E%3Cpath d='M12 186h6'/%3E%3Cpath d='M12 196h6'/%3E%3Cpath d='M4 206h14'/%3E%3Cpath d='M12 216h6'/%3E%3C/g%3E %3Cpath d='M2 96l8 5-8 5z' fill='%2300abfc'/%3E%3C/svg%3E"); }
+/* 警告ラベル：三角マーク（中はハート）＋細い線の枠＋下にネオンの斜めストライプ */
+.wall__warn { --s: var(--neon-p); padding: 32rem 5rem 26rem; writing-mode: vertical-rl; border: 1.5px solid var(--ink); font-weight: 800; font-size: 12rem; line-height: 1; letter-spacing: .22em; color: var(--ink);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='23' viewBox='0 0 26 23'%3E %3Cpath d='M13 1.5L24.5 21.5h-23z' fill='%23fff' stroke='%232a1f4a' stroke-width='2' stroke-linejoin='round'/%3E %3Cpath d='M13 18c-3.5-2.4-5-4-5-5.8 0-1.4 1-2.3 2.3-2.3 1.2 0 2 .7 2.7 1.7.7-1 1.5-1.7 2.7-1.7 1.3 0 2.3.9 2.3 2.3 0 1.8-1.5 3.4-5 5.8z' fill='%23f953c2'/%3E%3C/svg%3E") 50% 5rem / 22rem 20rem no-repeat, repeating-linear-gradient(-45deg, var(--s) 0 4rem, transparent 4rem 8rem) bottom / 100% 14rem no-repeat, rgba(255,255,255,.9); }
+.wall__warn.--p { left: 14rem; top: calc(var(--t) * 8 + 10rem); }
+.wall__warn.--c { --s: var(--neon-c); right: 14rem; top: calc(var(--t) * 8 + 20rem); }
+@media (max-width: 768px) {
+  /* スマホは余白がほとんど無く、飾りが本文の下に重なって読みにくくなるので出さない */
+  .wall { display: none; }
+}
+
+/* ---------- 3. 「診療中」の看板（トップの最初の画面・壁から突き出した袖看板）。縦長のサイバーウィンドウ型の線の枠 ---------- */
+.csign { position: absolute; z-index: 6; right: 0; top: calc(26 * var(--u)); display: flex; align-items: flex-start; pointer-events: none; }
+.csign__txt { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: 4rem; margin: 0; }
+.csign__main { --lit-c: var(--pink-h); --lit-s: 0 0 7rem rgba(249,83,194,.45); --seg: var(--neon-p);
+  position: relative; display: block; writing-mode: vertical-rl; text-orientation: upright; padding: 20rem 11rem; border: 2px solid transparent;
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E %3Cpath d='M11 1h44v44L45 55H1V11z' fill='%23fff' fill-opacity='.94' stroke='%23f953c2' stroke-width='2'/%3E %3Cpath d='M13 5h38v39l-8 8H5V13z' fill='none' stroke='%23f953c2' stroke-opacity='.5'/%3E%3C/svg%3E") 16 fill / 16rem stretch;
+  font-family: var(--f-jp); font-weight: 900; font-size: 40rem; line-height: 1; letter-spacing: .16em; background: none; color: var(--lit-c); text-shadow: var(--lit-s); box-shadow: none; }
+.csign[data-state="today"] .csign__main { --lit-c: var(--sky-h); --lit-s: 0 0 7rem rgba(0,171,252,.45); --seg: var(--neon-c); border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E %3Cpath d='M11 1h44v44L45 55H1V11z' fill='%23fff' fill-opacity='.94' stroke='%2300abfc' stroke-width='2'/%3E %3Cpath d='M13 5h38v39l-8 8H5V13z' fill='none' stroke='%2300abfc' stroke-opacity='.5'/%3E%3C/svg%3E"); }
+/* ステータスの丸（上）と区切りバー（下）。点灯中は丸が光り、バーが満ちる */
+.csign__main::before { content: ""; position: absolute; left: 50%; top: 6rem; width: 7rem; height: 7rem; translate: -50% 0; border-radius: 50%; background: var(--seg); box-shadow: 0 0 6rem var(--seg); }
+.csign__main::after { content: ""; position: absolute; left: 9rem; right: 9rem; bottom: 7rem; height: 4rem; background: repeating-linear-gradient(90deg, var(--seg) 0 5rem, transparent 5rem 7rem); }
+/* 4 文字の「本日診療」は、集合写真にかからない高さに収めるため少し小さく（PC のみ） */
+@media (min-width: 769px) { .csign[data-state="today"] .csign__main { font-size: 33rem; padding: 18rem 12rem; } }
+/* 消灯（休診）：灰色の線と文字、丸は消えて、バーは空 */
+.csign[data-state="off"] .csign__main { --lit-c: #8a83a0; --lit-s: none; border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E %3Cpath d='M11 1h44v44L45 55H1V11z' fill='%23fff' fill-opacity='.94' stroke='%23a39dae' stroke-width='2'/%3E %3Cpath d='M13 5h38v39l-8 8H5V13z' fill='none' stroke='%23a39dae' stroke-opacity='.6'/%3E%3C/svg%3E"); }
+.csign[data-state="off"] .csign__main::before { background: none; box-shadow: inset 0 0 0 1.5px #a39dae; }
+.csign[data-state="off"] .csign__main::after { background: repeating-linear-gradient(90deg, #dcd8e4 0 5rem, transparent 5rem 7rem); }
+/* 開始時刻・次回の日時を書いた小さな札（看板の横に、縦書きで。集合写真にかからない高さに収める） */
+.csign__sub { display: block; writing-mode: vertical-rl; text-orientation: upright; margin-top: 10rem; padding: 8rem 3rem; border: 2px solid transparent; border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E %3Crect x='1' y='1' width='58' height='58' fill='%23fff' fill-opacity='.82'/%3E %3Cpath d='M1 16V1h15M44 1h15v15M59 44v15H44M16 59H1V44' fill='none' stroke='%232a1f4a' stroke-width='2'/%3E%3C/svg%3E") 20 fill / 8rem stretch; background: none;
+  font-weight: 700; font-size: 9.5rem; line-height: 1.3; letter-spacing: 0; color: var(--ink); white-space: nowrap; }
+.csign__sub span { display: block; }
+@media (min-width: 769px) { .csign__sub { padding: 8rem 2rem; } .csign__sub span { display: inline; } .csign__sub span + span { margin-top: 6rem; } }
+.csign__sub[hidden] { display: none; }
+/* 壁から看板を支える腕金 */
+.csign__arm { order: 2; position: relative; width: calc(8 * var(--u)); height: 8rem; margin-top: 26rem; border: 1.5px solid var(--ink); border-width: 1.5px 0; background: none; }
+.csign__arm::after { content: ""; position: absolute; right: 0; top: -14rem; width: 8rem; height: 32rem; border: 1.5px solid var(--ink); border-right: 0; border-radius: 0; background: rgba(255,255,255,.9); }
+/* 点灯する状態では、読み込み後に1回だけパチパチッと点く（site.js が is-boot を付ける） */
+@media (prefers-reduced-motion: no-preference) {
+  .js .csign:not(.is-boot):not([data-state="off"]) .csign__main { color: #6c6684; text-shadow: none; }
+  .csign.is-boot:not([data-state="off"]) .csign__main { animation: signBoot 1.3s steps(1, end) 1 both; }
+  .js .csign:not(.is-boot):not([data-state="off"]) .csign__main::after { clip-path: inset(0 100% 0 0); }
+  .csign.is-boot:not([data-state="off"]) .csign__main::after { animation: segFill 1.3s steps(5, end) 1 both; }
+}
+@keyframes segFill { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes signBoot {
+  0% { color: #6c6684; text-shadow: none; }
+  10% { color: var(--lit-c); text-shadow: var(--lit-s); }
+  16% { color: #6c6684; text-shadow: none; }
+  26% { color: var(--lit-c); text-shadow: var(--lit-s); }
+  31% { color: #8d86a3; text-shadow: none; }
+  40%, 100% { color: var(--lit-c); text-shadow: var(--lit-s); }
+}
+@media (max-width: 768px) {
+  /* スマホ：ヒーローの下に、小さな横書きの看板 */
+  .csign { position: relative; top: auto; right: auto; justify-content: center; margin: 16rem 0 18rem; }
+  .csign__arm { display: none; }
+  .csign__txt { flex-direction: row; align-items: center; gap: 10rem; }
+  .csign__main { writing-mode: horizontal-tb; padding: 10rem 18rem 12rem 26rem; font-size: 22rem; letter-spacing: .14em; }
+  .csign__main::before { left: 10rem; top: 50%; translate: 0 -50%; }
+  .csign__main::after { left: 26rem; right: 18rem; bottom: 4rem; height: 3rem; }
+  .csign__sub { writing-mode: horizontal-tb; margin: 0; font-size: 10rem; padding: 5rem 9rem; }
+}
+
+/* ---------- 8. 角を斜めに切った枠（右上と左下） ----------
+   clip-path は外側の影も切るので、影は「右下に --d ずらした、ぼかしのない影」だけにして、その影ごと切る形にする。
+   ふちのある枠は、切った角にもふちの線（--cs-tr／--cs-bl）を描く。キーボードのフォーカス中は切らない（枠が欠けないように） */
+.btn, .h-join, .dlg__btn, .tabs button, .board__status .pcvr, .cm-tags span, .go-top__ic, .board, .hero__dlg, .gnav a,
+.ticket, .bcard, .about__card, .rule, .ahero, .box.glass, .gl__doc, .rota, .article.glass, .ctool, .follow {
+  --cut: 12rem; --d: 0rem; --bw: 2px; --bd: var(--ink);
+  --cs-tr: linear-gradient(45deg, transparent calc(50% - var(--bw)), var(--bd) 0) 100% 0 / var(--cut) var(--cut) no-repeat border-box;
+  --cs-bl: linear-gradient(225deg, transparent calc(50% - var(--bw)), var(--bd) 0) 0 100% / var(--cut) var(--cut) no-repeat border-box;
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, calc(100% + var(--d)) calc(var(--cut) + var(--d)), calc(100% + var(--d)) calc(100% + var(--d)), calc(var(--cut) + var(--d)) calc(100% + var(--d)), 0 calc(100% - var(--cut))); }
+:is(.btn, .h-join, .dlg__btn, .tabs button, .gnav a):focus-visible { clip-path: none; }
+/* ボタン */
+.btn { --d: 5rem; --bd: var(--pink-d); border-radius: 3rem; background: var(--cs-tr), var(--cs-bl), #fff; box-shadow: var(--d) var(--d) 0 var(--hard); }
+.btn:not(.--ink):hover { --d: 2rem; background: var(--cs-tr), var(--cs-bl), #fff4fa; box-shadow: var(--d) var(--d) 0 var(--hard); }
+.btn:active { --d: 0rem; box-shadow: none; }
+.btn.--ink { --d: 5rem; background: var(--cs-tr), var(--cs-bl), var(--pink-d); box-shadow: var(--d) var(--d) 0 var(--hard-pink); }
+.btn.--ink:hover { --d: 2rem; background: var(--cs-tr), var(--cs-bl), #a80d6b; box-shadow: var(--d) var(--d) 0 var(--hard-pink); }
+.btn i { border-radius: 3rem; }
+.h-join { --d: 4rem; --cut: 10rem; --bd: var(--pink-d); border-radius: 3rem; background: var(--cs-tr), var(--cs-bl), var(--pink-d); box-shadow: var(--d) var(--d) 0 var(--hard-pink); }
+.h-join:hover { --d: 2rem; box-shadow: var(--d) var(--d) 0 var(--hard-pink); }
+.h-join i { border-radius: 3rem; }
+.dlg__btn { --d: 3rem; --cut: 8rem; border-radius: 3rem; background: var(--cs-tr), var(--cs-bl), #fff; box-shadow: var(--d) var(--d) 0 var(--hard); }
+.dlg__btn:hover { --d: 1rem; box-shadow: var(--d) var(--d) 0 var(--hard); }
+.dlg__btn.--yes { --bd: var(--pink-d); background: var(--cs-tr), var(--cs-bl), var(--pink-d); box-shadow: var(--d) var(--d) 0 var(--hard-pink); }
+.go-top__ic { --d: 4rem; --cut: 10rem; border-radius: 3rem; background: var(--cs-tr), var(--cs-bl), #fff; box-shadow: var(--d) var(--d) 0 var(--hard); }
+.go-top:hover .go-top__ic { --d: 2rem; box-shadow: var(--d) var(--d) 0 var(--hard); }
+/* タグ・チップ */
+.tabs button { --cut: 10rem; --bw: 1px; --bd: rgba(42,31,74,.25); border-radius: 3rem; background: var(--cs-tr), var(--cs-bl), rgba(255,255,255,.88); }
+.tabs button:hover { --bd: var(--pink-d); }
+.tabs button[aria-selected="true"] { --bd: var(--ink); background: var(--cs-tr), var(--cs-bl), var(--ink); }
+.board__status .pcvr { --cut: 6rem; --bw: 1.5px; border-radius: 2rem; background: var(--cs-tr), var(--cs-bl), #fff; }
+.cm-tags span { --cut: 6rem; border-radius: 2rem; }
+/* ナビの項目：触れたとき・いまのページに、角を切った淡いピンクの札 */
+.gnav a { --cut: 8rem; margin: 0 -9rem; padding: 6rem 9rem; border-radius: 2rem; transition: color .3s, background .3s; }
+.gnav a::after { left: 9rem; right: 9rem; bottom: 1rem; }
+.gnav a:hover, .gnav a[aria-current="page"] { background: rgba(249,83,194,.1); }
+/* ウィンドウ風の枠 */
+.board { --d: 8rem; --cut: 24rem; border-radius: 3rem 3rem 0 0; background: var(--cs-tr), var(--cs-bl), linear-gradient(150deg, rgba(255,255,255,.82), rgba(255,255,255,.5)); box-shadow: var(--d) var(--d) 0 var(--hard); }
+.hero__dlg { --d: 7rem; --cut: 14rem; border-radius: 3rem; background: var(--cs-tr), var(--cs-bl), #fff; box-shadow: var(--d) var(--d) 0 var(--hard); }
+/* 箱（ガラスの箱）：やわらかい影の代わりに、角ごと切れるくっきりした影 */
+.ticket, .bcard, .about__card, .rule, .ahero, .box.glass, .gl__doc, .rota, .article.glass, .ctool, .follow { --d: 7rem; --cut: 16rem; border-radius: 4rem; box-shadow: var(--d) var(--d) 0 var(--hard); }
+/* 端の小さな型番（バインダーの板だけ） */
+.qboard::after { content: "SC-CLIP 02  //  A4" / ""; position: absolute; right: 22rem; bottom: 7rem; font-family: var(--f-en); font-weight: 600; font-size: 9rem; letter-spacing: .2em; color: rgba(255,255,255,.85); white-space: pre; }
+@media (max-width: 768px) {
+  .btn { --d: 4rem; } .btn.--ink { --d: 4rem; }
+  .board { --d: 5rem; --cut: 16rem; } .hero__dlg { --d: 4rem; --cut: 10rem; }
+  .ticket, .bcard, .about__card, .rule, .ahero, .box.glass, .gl__doc, .rota, .article.glass, .ctool, .follow { --d: 5rem; --cut: 12rem; }
+  .qboard::after { right: 12rem; bottom: 2rem; font-size: 8rem; }
+}
+
+/* 動きを減らす設定：瞬き・グリッチ・点灯演出は止める */
+@media (prefers-reduced-motion: reduce) {
+  .js .sec-head__en, .js .phead__en, .js .sub-h b, .js .faq__label b, .js .h-logo img, .js .f-logo img,
+  .btn:hover span, .btn:focus-visible span, .gnav a:hover, .gnav a:focus-visible, .h-join:hover, .h-join:focus-visible, .sp-link:hover, .sp-link:focus-visible,
+  .csign__main, .csign__main::after { animation: none !important; }
+}
+
+/* ---------- B. 箱・枠：パネル（影・ぼかし・ガラス）をやめて、線で描いたサイバーな枠に ----------
+   型は 3 種類だけ（SVG の border-image＝9 分割で、伸び縮みしても角の細工が崩れない）
+   ① ウィンドウ：左上と右下の面取り＋上辺の段差＋二重線＋左下のストライプ（ヘッダー・ヒーローのボード・ダイアログ）
+   ② 歯つきの箱：右上と左下の面取り＋右の辺の歯＋二重線＋隅のストライプ（診察券・ベントーの箱など）
+   ③ 四隅のブラケット（小さめの箱・検索欄・フォロー欄・看板の札） */
+.board, .hero__dlg, .ticket, .bcard, .about__card, .rule, .ahero, .box.glass, .gl__doc, .rota, .article.glass, .ctool, .follow {
+  clip-path: none; box-shadow: none; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border-radius: 0; border-style: solid; border-color: transparent; }
+.board, .hero__dlg { border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='120' viewBox='0 0 300 120'%3E %3Cpath d='M16 1H110l6 6h183v96l-16 16H1V17z' fill='%23fff' fill-opacity='.9' stroke='%232a1f4a' stroke-width='2'/%3E %3Cpath d='M20 6h87l6 6h181v89l-13 13H6V20z' fill='none' stroke='%232a1f4a' stroke-opacity='.45'/%3E %3Cpath d='M30 1h44' stroke='%23f953c2' stroke-width='4'/%3E %3Cpath d='M12 104l8-8h6l-8 8zM24 104l8-8h6l-8 8zM36 104l8-8h6l-8 8z' fill='%232a1f4a'/%3E %3Cpath d='M284 114l11-11' stroke='%2300abfc' stroke-width='2'/%3E%3C/svg%3E") 22 30 26 130 fill / 22rem 30rem 26rem 130rem stretch; }
+.board::before, .ticket::before, .ticket::after { display: none; }
+.ticket, .bcard, .about__card, .rule, .ahero, .box.glass, .gl__doc, .rota, .article.glass { border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E %3Cpath d='M1 1h182l16 16v182H17L1 183z' fill='%23fff' fill-opacity='.88' stroke='%232a1f4a' stroke-width='2'/%3E %3Cpath d='M6 6h175l13 13v175H19L6 181z' fill='none' stroke='%232a1f4a' stroke-opacity='.4'/%3E %3Cg fill='%232a1f4a' fill-opacity='.55'%3E%3Crect x='186' y='32' width='5' height='2'/%3E%3Crect x='186' y='40' width='5' height='2'/%3E%3Crect x='186' y='48' width='5' height='2'/%3E%3Crect x='186' y='56' width='5' height='2'/%3E%3Crect x='186' y='64' width='5' height='2'/%3E%3Crect x='186' y='72' width='5' height='2'/%3E%3Crect x='186' y='80' width='5' height='2'/%3E%3Crect x='186' y='88' width='5' height='2'/%3E%3Crect x='186' y='96' width='5' height='2'/%3E%3Crect x='186' y='104' width='5' height='2'/%3E%3Crect x='186' y='112' width='5' height='2'/%3E%3Crect x='186' y='120' width='5' height='2'/%3E%3Crect x='186' y='128' width='5' height='2'/%3E%3Crect x='186' y='136' width='5' height='2'/%3E%3Crect x='186' y='144' width='5' height='2'/%3E%3Crect x='186' y='152' width='5' height='2'/%3E%3Crect x='186' y='160' width='5' height='2'/%3E%3C/g%3E %3Cpath d='M10 1h16' stroke='%23f953c2' stroke-width='4'/%3E %3Cpath d='M11 26l14-14h4l-14 14zM18 26l11-11v4l-7 7z' fill='%232a1f4a'/%3E %3Cpath d='M4 193l6 6' stroke='%2300abfc' stroke-width='2'/%3E%3C/svg%3E") 30 fill / 30rem stretch round; }
+.bcard.b-step, .ctool, .follow { border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E %3Crect x='1' y='1' width='58' height='58' fill='%23fff' fill-opacity='.82'/%3E %3Cpath d='M1 16V1h15M44 1h15v15M59 44v15H44M16 59H1V44' fill='none' stroke='%232a1f4a' stroke-width='2'/%3E%3C/svg%3E") 20 fill / 16rem stretch; }
+@media (min-width: 1101px) {
+  .header::before { clip-path: none; box-shadow: none; border-radius: 0; border-color: transparent; background: none;
+    border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='120' viewBox='0 0 300 120'%3E %3Cpath d='M16 1H110l6 6h183v96l-16 16H1V17z' fill='%23fff' fill-opacity='.9' stroke='%232a1f4a' stroke-width='2'/%3E %3Cpath d='M20 6h87l6 6h181v89l-13 13H6V20z' fill='none' stroke='%232a1f4a' stroke-opacity='.45'/%3E %3Cpath d='M30 1h44' stroke='%23f953c2' stroke-width='4'/%3E %3Cpath d='M12 104l8-8h6l-8 8zM24 104l8-8h6l-8 8zM36 104l8-8h6l-8 8z' fill='%232a1f4a'/%3E %3Cpath d='M284 114l11-11' stroke='%2300abfc' stroke-width='2'/%3E%3C/svg%3E") 22 30 26 130 fill / 22rem 30rem 26rem 130rem stretch; }
+}
+@media (max-width: 768px) {
+  .board, .hero__dlg { border-image-width: 16rem 22rem 18rem 96rem; }
+  .ticket, .bcard, .about__card, .rule, .ahero, .box.glass, .gl__doc, .rota, .article.glass { border-image-width: 22rem; }
+}

@@ -41,6 +41,11 @@
         <span>はじめに.txt</span>
       </button>
     </div>
+    <!-- 「診療中」のネオン看板（壁から突き出した袖看板）。状態は site.js が日本時間で切り替える。スクリプトが動かないときは「休診」のまま -->
+    <div class="csign" id="csign" data-state="off">
+      <span class="csign__arm" aria-hidden="true"></span>
+      <p class="csign__txt"><span class="csign__main" id="csign-main">休診</span><span class="csign__sub" id="csign-sub" hidden></span></p>
+    </div>
   </section>
 
   <div class="band" aria-hidden="true">

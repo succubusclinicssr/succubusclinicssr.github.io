@@ -176,35 +176,13 @@ document.documentElement.classList.add("js");
     });
   }
 
-  /* ---------- 背景の演出：HUD（ロックオン枠・回るリング・システム表示）とピクセルハート ----------
-     並びは [種類, 色, 横%, 縦%]。種類：ring＝回るリング／lock＝ロックオン枠／lock-s＝小さい枠／txt＝システム表示／heart・heart-s＝ピクセルハート
-     色：pink／sky／lilac */
-  var fxLayouts = {
-    hero:     [["ring","sky",1,14], ["txt","lilac",20,4], ["txt","pink",36,90], ["lock","pink",96,40], ["lock-s","sky",58,2], ["heart","pink",47,1], ["heart-s","sky",84,94], ["heart-s","pink",4,70]],
-    news:     [["ring","sky",60,-4], ["txt","lilac",88,6], ["lock","pink",1,40], ["lock-s","sky",96,66], ["heart","pink",80,2]],
-    about:    [["ring","lilac",94,-6], ["txt","pink",4,72], ["lock","sky",1,14], ["heart-s","pink",40,2]],
-    maids:    [["lock","pink",1,44], ["txt","lilac",4,50], ["lock-s","sky",96,30], ["ring","lilac",94,62], ["heart","pink",56,2]],
-    schedule: [["ring","sky",1,6], ["txt","pink",94,8], ["txt","lilac",97,72], ["heart-s","sky",36,1]],
-    guide:    [["lock","pink",95,6], ["txt","sky",2,44], ["ring","sky",97,60], ["heart-s","pink",48,2]],
-    group:    [["txt","lilac",4,10], ["ring","sky",94,6], ["lock","pink",96,44], ["heart","sky",62,2]],
-    phead:    [["ring","sky",4,18], ["txt","lilac",74,30], ["lock","pink",88,22], ["txt","pink",74,92], ["lock-s","sky",78,4], ["heart","pink",22,20], ["heart-s","sky",86,46]],
-    sub:      [["lock","pink",1,10], ["txt","lilac",96,30], ["ring","sky",97,64], ["txt","sky",2,74], ["heart-s","pink",3,46]]
-  };
-  var HUD_TXT = ["SYS // ONLINE", "NURSE_SYNC 98%", "♡ HEART.EXE", "21:50 JST", "LOCK ON ▶", "SC_SYSTEM", "WELCOME_PATIENT", "SIGNAL ▮▮▮▯", "KARTE.EXE", "EVERY OTHER MON", "VRCHAT // LINK", "OSHI_SEARCH..."];
-  document.querySelectorAll("[data-fx]").forEach(function (box, bi) {
-    (fxLayouts[box.dataset.fx] || []).forEach(function (d, i) {
-      var el = document.createElement("i"), kind = d[0], x = d[2], y = d[3];
-      var time = "--dur:" + (6 + ((i * 7 + bi * 3) % 5)) + "s;--delay:" + (-((i * 13 + bi * 5) % 7)) + "s";
-      // 背景に浮かぶだけのピクセルハートは、背景を心電図に変えたので出さない（隠れハート探しの .secret-heart とは別物）
-      if (kind.indexOf("heart") === 0) return;
-      {
-        el.className = "hud --" + kind.replace("-s", " --s") + " --" + d[1];
-        if (kind === "txt") { var txt = HUD_TXT[(bi * 5 + i * 3) % HUD_TXT.length]; el.textContent = txt; el.style.setProperty("--n", txt.length); x = Math.min(x, 74); y = Math.max(y, 12); }
-      }
-      el.style.cssText += "left:" + x + "%;top:" + y + "%;" + time;
-      box.appendChild(el);
-    });
-  });
+  /* ---------- 背景の演出 ----------
+     計器に見えるHUD（ロックオン枠・回るリング・システム表示）とピクセルハートはやめた。
+     いまは壁に後付けされたケーブル・警告ラベル・ステッカー（build.py の WALL と site.css）だけで、ここでは何も作らない */
+
+  /* ---------- ネオンの見出し・ロゴのグリッチ：同時に起きないよう、1つずつ時間をずらす（周期は site.css の 10 秒） ---------- */
+  var glits = document.querySelectorAll(".sec-head__en, .phead__en, .sub-h b, .faq__label b, .h-logo img, .f-logo img");
+  [].forEach.call(glits, function (el, i) { el.style.setProperty("--gdl", (-(i * 10 / glits.length)).toFixed(2) + "s"); });
 
   /* ---------- トップ：ウィンドウのタイトルバー（ナビ）が画面から出たら、上にヘッダーを出す ---------- */
   var winBar = document.querySelector(".board__bar");
@@ -298,6 +276,31 @@ document.documentElement.classList.add("js");
     return out;
   }
   function md(t) { var j = new Date(t + JST); return pad(j.getUTCMonth() + 1) + "." + pad(j.getUTCDate()); }
+
+  /* ---------- トップ：「診療中」のネオン看板 ----------
+     日付の判定は上の openList（隔週月曜＋特別診療・休診）をそのまま使う。
+     a. 開催時間内 →「診療中」点灯 ／ b. 開催日でまだ始まっていない →「本日診療」点灯＋開始時刻 ／ c. それ以外 →「休診」消灯＋次回の日時
+     スクリプトが動かないときは、HTML に書いてある c の見た目（次回の表示なし）のまま */
+  var sign = $("csign");
+  if (sign) {
+    var JWD = ["日", "月", "火", "水", "木", "金", "土"];
+    var jday = function (t) { return new Date(t + JST).toISOString().slice(0, 10); };
+    var drawSign = function () {
+      var n = Date.now(), t = openList(n, 1)[0], st = "off", main = "休診", sub = [];
+      if (t != null && t <= n) { st = "open"; main = "診療中"; }
+      else if (t != null && jday(t) === jday(n)) { st = "today"; main = "本日診療"; sub = [hm(hoursAt(t).s) + "〜"]; }
+      else if (t != null) { var j = new Date(t + JST); sub = ["次回 " + (j.getUTCMonth() + 1) + "/" + j.getUTCDate() + "（" + JWD[j.getUTCDay()] + "）", hm(hoursAt(t).s) + "〜"]; }
+      var key = st + "|" + main + "|" + sub.join("|");
+      if (sign.__key === key) return; sign.__key = key;
+      sign.dataset.state = st;
+      $("csign-main").textContent = main;
+      var sb = $("csign-sub"); sb.innerHTML = sub.map(function (x) { return "<span>" + x + "</span>"; }).join(""); sb.hidden = !sub.length;
+    };
+    drawSign();
+    setInterval(drawSign, 20000);
+    // 点灯している看板は、読み込みのあとに1回だけ「パチパチッ」と点く（動きを減らす設定のときはしない）
+    if (!reduce) onReady(function () { setTimeout(function () { sign.classList.add("is-boot"); }, 400); });
+  }
   function setNum(id, v) { var el = $(id); if (el.textContent !== v) { el.textContent = v; if (!reduce && id !== "cd-s") { el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); } } }
   var lastMd = "";
   function tick() {

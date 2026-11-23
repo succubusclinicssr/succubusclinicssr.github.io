@@ -307,7 +307,15 @@ def ecg_lane(k):
     return (f'<div class="ecg__lane --{k}">{svg("ecg__ghost")}'
             f'<div class="ecg__draw">{svg("ecg__glow")}{svg("ecg__line")}</div><i class="ecg__head"></i></div>')
 
+# 壁の飾り：基板の配線・照準・目盛り・警告ラベル（並べ方と絵は site.css。PC の左右の余白だけ）
+WALL = '''<div class="wall" aria-hidden="true">
+  <i class="wall__circuit"></i><i class="wall__reticle"></i><i class="wall__ruler"></i>
+  <span class="wall__warn --p">ときめき注意</span>
+  <span class="wall__warn --c">心拍上昇注意</span>
+</div>'''
+
 BG = '''<div class="tilebg" aria-hidden="true"></div>
+''' + WALL + '''
 <div class="ecg" aria-hidden="true">''' + ecg_lane("p") + ecg_lane("c") + '''</div>
 <div class="cursor" id="cursor" aria-hidden="true"><i></i></div>
 <div class="grain" aria-hidden="true"></div>'''
