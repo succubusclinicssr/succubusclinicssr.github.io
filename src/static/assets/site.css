@@ -1130,7 +1130,7 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
 }
 
 /* CONTACT：ちびキャラ */
-.group__chara { right: 70rem; bottom: -36rem; width: auto; height: 118%; transform-origin: 50% 100%; }
+.group__chara { right: -24rem; bottom: -36rem; width: auto; height: 114%; transform-origin: 50% 100%; }
 .group__banner:hover .group__chara { transform: translateY(-10rem) rotate(4deg); }
 @media (max-width: 768px) { .group__chara { right: 50%; bottom: -24rem; width: auto; height: 240rem; } }
 /* 起動画面：リングと進捗の重なりを解消、ようこそ文字は1行で */
@@ -2165,7 +2165,7 @@ body { font-family: var(--f-jp); }
   .ticket__date { font-size: 70rem; }
   .ticket__date small { font-size: 18rem; }
   .count b { font-size: 22rem; }
-  .group__logo { font-size: 44rem; }
+  .group__logo { font-size: 30rem; }
   .concept__no { font-size: 36rem; }
   .cal__head b { font-size: 26rem; }
   .share__tag code { font-size: 44rem; }

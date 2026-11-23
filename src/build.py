@@ -311,7 +311,7 @@ LOADING = '''<div class="loader" id="loader" aria-hidden="true">
       </div>
       <div class="loader__stage">
         <div class="loader__prog">
-          <div class="loader__track"><i class="loader__fill" id="ld-fill"></i><img class="loader__chibi" id="ld-chibi" src="img/chibi.webp" alt="" width="900" height="1089"></div>
+          <div class="loader__track"><i class="loader__fill" id="ld-fill"></i><img class="loader__chibi" id="ld-chibi" src="img/chibi.webp" alt="" width="900" height="932"></div>
           <p class="loader__pct"><b id="ld-pct">000</b><small>%</small></p>
         </div>
         <ol class="loader__log mono" id="ld-log">
