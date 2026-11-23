@@ -1,0 +1,9 @@
+{
+  "title": "集合写真 4",
+  "image": "/uploads/photos/photo04.webp",
+  "alt": "",
+  "order": 40,
+  "hero": true,
+  "gallery": true,
+  "hero_pos": "top"
+}

@@ -1,0 +1,9 @@
+{
+  "title": "集合写真 2",
+  "image": "/uploads/photos/photo02.webp",
+  "alt": "",
+  "order": 20,
+  "hero": true,
+  "gallery": true,
+  "hero_pos": "top"
+}
