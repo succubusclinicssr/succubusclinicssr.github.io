@@ -1180,7 +1180,7 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
 
 /* ABOUT（トップ）：写真を大きく上に、文章カードは下に2カラム */
 .about__wrap { min-height: 0; display: grid; }
-.about__visual { position: relative; z-index: 1; left: auto; right: auto; top: auto; width: 100%; max-width: 1240rem; margin: 0 auto; aspect-ratio: 3 / 2; }
+.about__visual { position: relative; z-index: 1; left: auto; right: auto; top: auto; width: 100%; max-width: 1240rem; margin: 0 auto; aspect-ratio: 1801 / 974; }
 .about__visual img { -webkit-mask: none; mask: none; }
 .about__bg { top: 20rem; right: -60rem; }
 .about__card { width: auto; margin-top: 20rem; display: grid; grid-template-columns: 430rem minmax(0, 1fr); grid-template-areas: "s t" "l t" "f t" "b t"; column-gap: 56rem; align-content: start; padding: 44rem 52rem; }
@@ -2264,4 +2264,15 @@ body { font-family: var(--f-jp); }
 @media (max-width: 768px) {
   .pt__core img { width: 240rem; }
   .pt__txt { font-size: 11rem; }
+}
+
+/* ==== ロゴ（3段に積んだ形。横：縦＝約 1.65：1）に合わせた大きさ ====
+   横長のロゴ用だった高さのままだと小さくて読めないので、ヘッダーとフッターだけ大きくする。
+   パソコンのヘッダーは帯から少しはみ出す形（余白をマイナスにして、帯の高さは変えない） */
+.h-logo img { height: 96rem; }
+.f-logo img { height: 132rem; }
+@media (min-width: 1101px) { .header .h-logo img, .bb__nav .h-logo img { height: 96rem; margin-block: -24rem; } }
+@media (max-width: 768px) {
+  .h-logo img { height: auto; max-height: 68rem; }
+  .f-logo img { height: 104rem; }
 }

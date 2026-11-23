@@ -288,7 +288,7 @@ BG = '''<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 # 画面遷移：ロード画面と同じ色の帯が斜めに覆って、次のページで抜けていく（動きは site.js / site.css）
 PAGE_TRANSITION = '''<div class="pt" id="pt" aria-hidden="true">
   <div class="pt__bands"><i></i><i></i><i></i><i></i></div>
-  <div class="pt__core"><img src="img/logo.webp" alt="" width="960" height="239"><p class="pt__txt mono"><i></i>NOW LOADING<b><span>.</span><span>.</span><span>.</span></b></p></div>
+  <div class="pt__core"><img src="img/logo.webp" alt="" width="720" height="435"><p class="pt__txt mono"><i></i>NOW LOADING<b><span>.</span><span>.</span><span>.</span></b></p></div>
 </div>'''
 # 前のページから画面遷移で来たときは、最初の表示から帯で覆っておく（読み込み中にページが見えないように）
 PT_HEAD = '<script>try{if(sessionStorage.getItem("md-pt")){sessionStorage.removeItem("md-pt");if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("pt-arrive")}}catch(e){}</script>'
@@ -307,7 +307,7 @@ LOADING = '''<div class="loader" id="loader" aria-hidden="true">
           <circle cx="100" cy="100" r="96" fill="none" stroke="rgba(244,114,168,.45)" stroke-width=".6" stroke-dasharray="2 4"/>
           <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(78,174,233,.4)" stroke-width=".5"/>
           <text><textPath href="#ld-ring">SUCCUBUS CLINIC ✦ VR NURSE CAFÉ ✦ WELCOME PATIENT ✦ SUCCUBUS CLINIC ✦ VR NURSE CAFÉ ✦ WELCOME PATIENT ✦</textPath></text></svg>
-        <div class="loader__logo"><img src="img/logo-full.webp" alt="" width="1000" height="641"><img class="--a" src="img/logo-full.webp" alt="" width="1000" height="641"><img class="--b" src="img/logo-full.webp" alt="" width="1000" height="641"></div>
+        <div class="loader__logo"><img src="img/logo-full.webp" alt="" width="1000" height="604"><img class="--a" src="img/logo-full.webp" alt="" width="1000" height="604"><img class="--b" src="img/logo-full.webp" alt="" width="1000" height="604"></div>
       </div>
       <div class="loader__stage">
         <div class="loader__prog">
@@ -332,7 +332,7 @@ def header(cur):
     sp = "\n".join(f'  <a class="sp-link" href="{k}.html"{AC if k == cur else ""}>{en}<small>{jp}</small></a>' for k, en, jp in NAV)
     return f'''<header class="header">
   <span class="os-dots h-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-  <a class="h-logo" href="index.html"><img src="img/logo.webp" alt="{EVENT_FULL} トップへ" width="960" height="239"></a>
+  <a class="h-logo" href="index.html"><img src="img/logo.webp" alt="{EVENT_FULL} トップへ" width="720" height="435"></a>
   <nav class="gnav" aria-label="メインメニュー">
     <ul class="glass">{lis}</ul>
   </nav>
@@ -352,7 +352,7 @@ def win_nav():
     """トップのウィンドウのタイトルバー＝ナビゲーション（PCの広い画面）"""
     lis = "".join(f'<li><a href="{k}.html">{en}</a></li>' for k, en, jp in NAV)
     xl = "新しいタブで開く" if X_URL != "#" else TBD
-    return (f'<a class="h-logo" href="index.html"><img src="img/logo.webp" alt="{EVENT_FULL} トップへ" width="960" height="239"></a>'
+    return (f'<a class="h-logo" href="index.html"><img src="img/logo.webp" alt="{EVENT_FULL} トップへ" width="720" height="435"></a>'
             f'<nav class="gnav" aria-label="メインメニュー"><ul>{lis}</ul></nav>'
             f'<a class="h-join" {ext(GROUP_URL)}>JOIN GROUP<i>{ARROW}</i></a>'
             f'<a class="h-bell glass" href="contact.html" aria-label="受付（お問い合わせ）"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 24h22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M7 21.5a9 9 0 0 1 18 0z" fill="#ff9cc6" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12.5V9.5M13 9.5h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M11.2 18.6a5.4 5.4 0 0 1 3.2-3.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></a><a class="h-x glass" {ext(X_URL)} aria-label="{EVENT}のX（{xl}）"><svg viewBox="0 0 512 512" aria-hidden="true"><use href="#i-x"/></svg></a>')
@@ -362,7 +362,7 @@ def footer():
     return f'''<footer class="footer">
   <div class="inner">
     <div class="footer__top">
-      <a class="f-logo" href="index.html"><img src="img/logo.webp" alt="{EVENT_FULL}" width="960" height="239"><small class="f-tag">VRC NURSE CAFÉ EVENT</small></a>
+      <a class="f-logo" href="index.html"><img src="img/logo.webp" alt="{EVENT_FULL}" width="720" height="435"><small class="f-tag">VRC NURSE CAFÉ EVENT</small></a>
       <nav class="footer__nav" aria-label="フッターメニュー">{links}<a href="contact.html">CONTACT</a><a {ext(X_URL)}>X</a></nav>
     </div>
     <button class="footer__mark" type="button" data-omikuji aria-label="あなたの推しがきっと見つかる（処方おみくじを引く）"><span>あなたの推しが</span><span>きっと見つかる</span></button>
