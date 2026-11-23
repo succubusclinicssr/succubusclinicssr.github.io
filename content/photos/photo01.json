@@ -1,0 +1,9 @@
+{
+  "title": "仮の集合写真",
+  "image": "/uploads/photos/photo01.webp",
+  "alt": "仮の集合写真",
+  "order": 10,
+  "hero": true,
+  "gallery": true,
+  "hero_pos": "top"
+}

@@ -9,42 +9,33 @@ document.documentElement.classList.add("js");
   var onReady = function (fn) { if (root.classList.contains("is-ready")) fn(); else readyFns.push(fn); };
   var setReady = function () { if (root.classList.contains("is-ready")) return; root.classList.add("is-ready"); readyFns.splice(0).forEach(function (f) { f(); }); };
   var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
-  var ARROW = '<svg class="chev" viewBox="0 0 22 12" aria-hidden="true"><use href="#i-arrow"/></svg>';
+  var ARROW = '<svg viewBox="0 0 16 12" aria-hidden="true"><use href="#i-arrow"/></svg>';
 
   /* お知らせのデータ（新しい順）。管理画面（/admin）の「お知らせ」で追加・編集すると、
      build.py が assets/news.js を作り直し、トップ・NEWS一覧・記事ページのすべてに反映されます。 */
   var CAT = { event: ["イベント", "EVENT"], maid: ["ナース", "NURSE"], menu: ["メニュー", "MENU"], info: ["お知らせ", "INFO"] };
   var NEWS = (window.MD_NEWS || []).filter(function (n) { return CAT[n.cat]; });
   var link = function (n) { return "news-detail.html#" + n.id; };
-  /* 仮画像（build.py の nosig() と同じ部品）：濃紫の面＋走査線＋ハートの照準＋ NO SIGNAL */
-  function nosig(label) {
-    return '<div class="nosig" role="img" aria-label="画像は準備中です"><svg class="nosig__mk" aria-hidden="true"><use href="#m-reticle"/></svg>' +
-      '<span class="nosig__t mono" aria-hidden="true">NO SIGNAL</span><span class="nosig__s mono" aria-hidden="true">// ' + label + "</span></div>";
-  }
-  /* お知らせのサムネイル（画像なしは NO SIGNAL） */
   function thumb(n) {
     var t = n.th;
     if (t.img) return '<div class="th th-img"><img src="' + t.img + '" alt="" loading="lazy" style="object-position:' + (t.pos || "50% 20%") + '"></div>';
-    return '<div class="th">' + nosig("NEWS_IMG") + "</div>";
+    if (t.logo) return '<div class="th th-logo"><img src="img/logo.webp" alt="" loading="lazy"></div>';
+    return '<div class="th ' + t.cls + '"><span>' + t.t + (t.s ? "<small>" + t.s + "</small>" : "") + "</span></div>";
   }
 
-  /* ---------- トップ：お知らせ（左 2/3 に最新の1件、右 1/3 に日付の一覧。1件だけのあいだは開院までの小パネル） ---------- */
+  /* ---------- トップ：お知らせ ---------- */
   var bento = $("news-bento");
   if (bento) {
-    var n0 = NEWS[0], side;
-    var feat = n0 ? '<a class="nfeat fr --l rv" data-frame="l" href="' + link(n0) + '"><div class="card__thumb">' + thumb(n0) + '</div><div class="nfeat__body"><p class="nfeat__meta"><span class="tag">' + CAT[n0.cat][0] +
-      '</span><time class="mono">' + n0.date + '</time><span class="mono">No.' + String(NEWS.length).padStart(3, "0") + '</span></p><p class="nfeat__title">' + esc(n0.title) + '</p><span class="nfeat__open mono">OPEN<i>' + ARROW + "</i></span></div></a>"
-      : '<div class="nfeat fr --l rv" data-frame="l"><div class="card__thumb">' + nosig("NEWS_PENDING") + '</div><div class="nfeat__body"><p class="nfeat__title">お知らせはまだありません。</p></div></div>';
-    if (NEWS.length > 1) {
-      side = '<div class="nside fr --3 rv"><p class="nside__h mono">//INDEX <span>' + NEWS.length + ' FILES</span></p><ul>' + NEWS.slice(1, 6).map(function (n) {
-        return '<li><a href="' + link(n) + '"><time class="mono">' + n.date + '</time><span class="t">' + esc(n.title) + "</span></a></li>";
-      }).join("") + '</ul><a class="btn --line" href="news.html"><span>VIEW ALL</span><i>' + ARROW + "</i></a></div>";
-    } else {
-      side = '<div class="nside rv"><div class="nmini fr --3"><p class="mono nmini__h">//NEXT CLINIC IN</p><p class="nmini__cd mono" data-cd>--D --:--:--</p><p class="mono nmini__s"><span data-next>12.07 MON</span> 21:50 JST</p></div>' +
-        '<div class="nmini fr --3"><p class="mono nmini__h">//NEXT REPORT</p><p class="nmini__t">会場ワールド・参加方法は、決まりしだいお知らせします。</p></div>' +
-        '<a class="btn --line" href="news.html"><span>VIEW ALL</span><i>' + ARROW + "</i></a></div>";
-    }
-    bento.innerHTML = feat + side;
+    bento.classList.add("--n" + Math.min(NEWS.length, 5));
+    bento.innerHTML = NEWS.slice(0, 5).map(function (n, i) {
+      return '<a class="card rv --' + n.cat + (i === 0 ? " --feature" : "") + '" href="' + link(n) + '"><div class="card__bar"><span class="card__dots"><i></i><i></i><i></i></span><span class="card__cat">' + CAT[n.cat][0] +
+        '</span><span class="card__date">' + n.date + '</span></div><div class="card__thumb">' + thumb(n) + '</div><p class="card__title">' + esc(n.title) + '</p><span class="card__check">OPEN<i>▶</i></span></a>';
+    }).join("");
+    var nl = document.querySelector("#news-list ul");
+    if (nl && NEWS.length <= 5) $("news-list").hidden = true;
+    if (nl) nl.innerHTML = NEWS.slice(5, 8).map(function (n) {
+      return '<li><a href="' + link(n) + '"><time>' + n.date + '</time><span class="cat">' + CAT[n.cat][1] + '</span><span class="t">' + esc(n.title) + "</span>" + ARROW + "</a></li>";
+    }).join("");
   }
 
   /* ---------- NEWS一覧：カテゴリとページ送り ---------- */
@@ -65,7 +56,7 @@ document.documentElement.classList.add("js");
       /* ファイル一覧の形：アイコン（サムネイル）・タイトル・種類・日付・OPEN */
       nlist.innerHTML = list.slice((page - 1) * PER, page * PER).map(function (n) {
         return '<a class="nfile --' + n.cat + '" href="' + link(n) + '"><span class="nfile__ic">' + thumb(n) + '</span><span class="nfile__name">' + esc(n.title) +
-          '</span><span class="nfile__type"><i></i>' + CAT[n.cat][0] + '</span><span class="nfile__date">' + n.date + '</span><span class="nfile__open">OPEN<i>' + ARROW + '</i></span></a>';
+          '</span><span class="nfile__type"><i></i>' + CAT[n.cat][0] + '</span><span class="nfile__date">' + n.date + '</span><span class="nfile__open">OPEN<i>▶</i></span></a>';
       }).join("") || '<p class="empty">このカテゴリのお知らせはまだありません。</p>';
       var cnt = $("nwin-count"); if (cnt) cnt.textContent = list.length + " 件";
       var h = '<button type="button" class="--prev" aria-label="前のページ" data-p="' + (page - 1) + '"' + (page === 1 ? " disabled" : "") + ">" + ARROW + "</button>";
@@ -98,14 +89,123 @@ document.documentElement.classList.add("js");
     addEventListener("hashchange", function () { drawArticle(); scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
   }
 
-  /* ---------- トップ：写真の切り替え（ネオンの走査線が走って切り替わる） ---------- */
-  var slideBox = $("hero-slides"), slides = slideBox ? slideBox.querySelectorAll("img") : [];
-  if (slideBox) {
-    var total0 = $("hero-total"); if (total0) total0.textContent = pad(slides.length);
-    if (slides.length < 2) { var kvSec = $("kv"); if (kvSec) kvSec.classList.add("--single"); if (!slides.length && $("hero-no")) $("hero-no").textContent = "00"; }
+  /* ---------- 文字のデコード演出 ---------- */
+  var GLYPH = "ABCDEFGHKLNOPRSTUVXYZ0123456789#*+";
+  var scrBusy = 0, fitPending = false;
+  function scramble(root, dur) {
+    if (reduce || !root) return;
+    dur = dur || 700;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [], n;
+    while ((n = walker.nextNode())) if (n.nodeValue.trim()) nodes.push({ n: n, t: n.__orig || (n.__orig = n.nodeValue) });
+    var start = performance.now(); scrBusy++;
+    (function frame(now) {
+      var p = Math.min(1, (now - start) / dur);
+      nodes.forEach(function (o) { var t = o.t, keep = Math.floor(t.length * p), out = t.slice(0, keep); for (var k = keep; k < t.length; k++) out += t[k] === " " ? " " : GLYPH[(Math.random() * GLYPH.length) | 0]; o.n.nodeValue = out; });
+      if (p < 1) requestAnimationFrame(frame); else { nodes.forEach(function (o) { o.n.nodeValue = o.t; }); scrBusy--; if (!scrBusy && fitPending) { fitPending = false; fitTitle(); } }
+    })(start);
   }
-  if (slideBox && slides.length > 1) {
-    var si = 0, sTimer, SINT = 5200, dotBox = $("hero-dots");
+
+  /* ---------- トップの大きな文字を幅いっぱいに ---------- */
+  /* トップの大きな文字：病院の端末のように1文字ずつタイプされる（最後にカーソル） */
+  function typeTitle() {
+    var longest = 0;
+    document.querySelectorAll("#hero-title .lines").forEach(function (lines) {
+      var t = 0;
+      lines.querySelectorAll(":scope > .fit").forEach(function (f) {
+        if (reduce) { f.classList.add("is-typed"); return; }
+        var n = Math.max(4, f.textContent.length), d = n * 62;
+        f.style.setProperty("--n", n); f.style.setProperty("--td", d + "ms"); f.style.animationDelay = t + "ms";
+        f.classList.remove("is-typing", "is-erasing"); void f.offsetWidth; f.classList.add("is-typing"); t += d + 90;
+      });
+      longest = Math.max(longest, t);
+    });
+    return longest;
+  }
+  /* はじめに「Hello, World!」とタイプ → 少し止まって消す → 「WELCOME TO SUCCUBUS CLINIC」をタイプ */
+  var HELLO = { pc: '<span class="fit --hello">Hello, <span class="g">World!</span><i class="hero__cur"></i></span>',
+                sp: '<span class="fit --hello">Hello,</span><span class="fit --hello"><span class="g">World!</span><i class="hero__cur"></i></span>' };
+  function introTitle() {
+    var t = $("hero-title");
+    if (!t || reduce || root.classList.contains("is-open-now")) { typeTitle(); return; }
+    var groups = [].slice.call(t.querySelectorAll(".lines")), saved = groups.map(function (g) { return g.innerHTML; });
+    fitTitle();
+    var sizes = groups.map(function (g) { return [].map.call(g.querySelectorAll(":scope > .fit"), function (f) { return f.style.fontSize; }); });
+    scrBusy++;   // タイプ中は文字の大きさを測り直さない
+    groups.forEach(function (g, i) {
+      g.innerHTML = g.classList.contains("lines--sp") ? HELLO.sp : HELLO.pc;
+      [].forEach.call(g.querySelectorAll(":scope > .fit"), function (f, k) { f.style.fontSize = sizes[i][Math.min(k, sizes[i].length - 1)]; });
+    });
+    var tHello = typeTitle();
+    setTimeout(function () {
+      var tErase = 0;
+      groups.forEach(function (g) {
+        var t2 = 0;
+        [].slice.call(g.querySelectorAll(":scope > .fit")).reverse().forEach(function (f) {
+          var n = Math.max(4, f.textContent.length), d = n * 30;
+          f.style.setProperty("--n", n); f.style.setProperty("--ed", d + "ms"); f.style.animationDelay = t2 + "ms";
+          f.classList.remove("is-typing", "is-typed"); void f.offsetWidth; f.classList.add("is-erasing"); t2 += d + 40;
+        });
+        tErase = Math.max(tErase, t2);
+      });
+      setTimeout(function () {
+        groups.forEach(function (g, i) { g.innerHTML = saved[i]; });
+        scrBusy--; fitPending = false; fitTitle(); typeTitle();
+      }, tErase + 140);
+    }, tHello + 950);
+  }
+  function fitTitle() {
+    if (scrBusy > 0) { fitPending = true; return; }
+    document.querySelectorAll("#hero-title .lines").forEach(function (lines) {
+      if (getComputedStyle(lines).display === "none") return;
+      var W = lines.clientWidth, H = lines.clientHeight; if (!W) return;
+      var fits = lines.querySelectorAll(":scope > .fit"), sizes = [];
+      fits.forEach(function (f) { f.style.fontSize = "100px"; sizes.push(100 * W / (f.offsetWidth || 1)); });
+      fits.forEach(function (f, k) { f.style.fontSize = sizes[k] + "px"; });
+      var total = 0; fits.forEach(function (f) { total += f.offsetHeight; });
+      if (total > H) { var r = H / total; fits.forEach(function (f, k) { f.style.fontSize = (sizes[k] * r) + "px"; }); }
+    });
+  }
+
+  /* ---------- 背景の演出：HUD（ロックオン枠・回るリング・システム表示）とピクセルハート ----------
+     並びは [種類, 色, 横%, 縦%]。種類：ring＝回るリング／lock＝ロックオン枠／lock-s＝小さい枠／txt＝システム表示／heart・heart-s＝ピクセルハート
+     色：pink／sky／lilac */
+  var fxLayouts = {
+    hero:     [["ring","sky",1,14], ["txt","lilac",20,4], ["txt","pink",36,90], ["lock","pink",96,40], ["lock-s","sky",58,2], ["heart","pink",47,1], ["heart-s","sky",84,94], ["heart-s","pink",4,70]],
+    news:     [["ring","sky",60,-4], ["txt","lilac",88,6], ["lock","pink",1,40], ["lock-s","sky",96,66], ["heart","pink",80,2]],
+    about:    [["ring","lilac",94,-6], ["txt","pink",4,72], ["lock","sky",1,14], ["heart-s","pink",40,2]],
+    maids:    [["lock","pink",1,44], ["txt","lilac",4,50], ["lock-s","sky",96,30], ["ring","lilac",94,62], ["heart","pink",56,2]],
+    schedule: [["ring","sky",1,6], ["txt","pink",94,8], ["txt","lilac",97,72], ["heart-s","sky",36,1]],
+    guide:    [["lock","pink",95,6], ["txt","sky",2,44], ["ring","sky",97,60], ["heart-s","pink",48,2]],
+    group:    [["txt","lilac",4,10], ["ring","sky",94,6], ["lock","pink",96,44], ["heart","sky",62,2]],
+    phead:    [["ring","sky",4,18], ["txt","lilac",74,30], ["lock","pink",88,22], ["txt","pink",74,92], ["lock-s","sky",78,4], ["heart","pink",22,20], ["heart-s","sky",86,46]],
+    sub:      [["lock","pink",1,10], ["txt","lilac",96,30], ["ring","sky",97,64], ["txt","sky",2,74], ["heart-s","pink",3,46]]
+  };
+  var HUD_TXT = ["SYS // ONLINE", "NURSE_SYNC 98%", "♡ HEART.EXE", "21:50 JST", "LOCK ON ▶", "SC_SYSTEM", "WELCOME_PATIENT", "SIGNAL ▮▮▮▯", "KARTE.EXE", "EVERY OTHER MON", "VRCHAT // LINK", "OSHI_SEARCH..."];
+  document.querySelectorAll("[data-fx]").forEach(function (box, bi) {
+    (fxLayouts[box.dataset.fx] || []).forEach(function (d, i) {
+      var el = document.createElement("i"), kind = d[0], x = d[2], y = d[3];
+      var time = "--dur:" + (6 + ((i * 7 + bi * 3) % 5)) + "s;--delay:" + (-((i * 13 + bi * 5) % 7)) + "s";
+      if (kind.indexOf("heart") === 0) {
+        el.className = "px-heart --" + d[1] + (kind === "heart-s" ? " --s" : "");
+      } else {
+        el.className = "hud --" + kind.replace("-s", " --s") + " --" + d[1];
+        if (kind === "txt") { var txt = HUD_TXT[(bi * 5 + i * 3) % HUD_TXT.length]; el.textContent = txt; el.style.setProperty("--n", txt.length); x = Math.min(x, 74); y = Math.max(y, 12); }
+      }
+      el.style.cssText += "left:" + x + "%;top:" + y + "%;" + time;
+      box.appendChild(el);
+    });
+  });
+
+  /* ---------- トップ：ウィンドウのタイトルバー（ナビ）が画面から出たら、上にヘッダーを出す ---------- */
+  var winBar = document.querySelector(".board__bar");
+  if (winBar && document.body.classList.contains("is-home") && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) { document.body.classList.toggle("is-hdr", !es[0].isIntersecting); }, { rootMargin: "-8px 0px 0px 0px" }).observe(winBar);
+  }
+
+  /* ---------- トップ：写真の切り替え（文字は固定、写真はハートが広がって切り替わる） ---------- */
+  var slideBox = $("hero-slides");
+  if (slideBox) {
+    var slides = slideBox.querySelectorAll("img"), si = 0, sTimer, SINT = 5200, dotBox = $("hero-dots");
     var ensure = function (k) { var im = slides[(k + slides.length) % slides.length]; if (im.dataset.src && !im.getAttribute("src")) im.src = im.dataset.src; return im; };
     var total = $("hero-total"); if (total) total.textContent = pad(slides.length);
     addEventListener("load", function () { setTimeout(function () { ensure(1); }, 600); });
@@ -149,9 +249,10 @@ document.documentElement.classList.add("js");
     fig.style.transition = "transform .8s cubic-bezier(.22,1,.36,1)";
     hero.addEventListener("pointermove", function (e) {
       var r = hero.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-      fig.style.transform = "translate(" + (x * 14) + "px," + (y * 8) + "px)";
+      fig.style.transform = "translate(" + (x * 22) + "px," + (y * 10) + "px)";
+      $("hero-title").style.translate = (-x * 12) + "px " + (-y * 8) + "px";
     });
-    hero.addEventListener("pointerleave", function () { fig.style.transform = ""; });
+    hero.addEventListener("pointerleave", function () { fig.style.transform = ""; $("hero-title").style.translate = ""; });
   }
 
   /* ---------- カーソルの光 ---------- */
@@ -189,26 +290,9 @@ document.documentElement.classList.add("js");
   function md(t) { var j = new Date(t + JST); return pad(j.getUTCMonth() + 1) + "." + pad(j.getUTCDate()); }
   function setNum(id, v) { var el = $(id); if (el.textContent !== v) { el.textContent = v; if (!reduce && id !== "cd-s") { el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); } } }
   var lastMd = "";
-  var nextEls = document.querySelectorAll("[data-next]"), cdEls = document.querySelectorAll("[data-cd]");
   function tick() {
     var now = Date.now(), jn = new Date(now + JST);
-    if (nextEls.length || cdEls.length || $("syr-fill")) {
-      var tn = openList(now, 1)[0], jt = new Date(tn + JST), ns = Math.floor(Math.max(0, tn - now) / 1000);
-      var nl = md(tn) + " " + WD[jt.getUTCDay()];
-      nextEls.forEach(function (el) { if (el.textContent !== nl) el.textContent = nl; });
-      var cdl = Math.floor(ns / 86400) + "D " + pad(Math.floor(ns % 86400 / 3600)) + ":" + pad(Math.floor(ns % 3600 / 60)) + ":" + pad(ns % 60);
-      cdEls.forEach(function (el) { el.textContent = cdl; });
-      /* 注射器のゲージ：前回の診療から次の診療までの、たまり具合（14日で満タン） */
-      if ($("syr-fill")) { var f = Math.max(0, Math.min(1, 1 - (tn - now) / (REG_EVERY * 864e5))); $("syr-fill").style.transform = "scaleX(" + f.toFixed(3) + ")"; $("syr-pct").textContent = Math.round(f * 100) + "%"; }
-    }
     if ($("jst-clock")) $("jst-clock").textContent = pad(jn.getUTCHours()) + ":" + pad(jn.getUTCMinutes()) + ":" + pad(jn.getUTCSeconds());
-    var hn = $("hn-date");
-    if (hn) {
-      var t1 = openList(now, 1)[0], j1 = new Date(t1 + JST), m1 = md(t1);
-      if (hn.textContent !== m1 || !hn.dataset.ok) { hn.dataset.ok = 1; hn.textContent = m1; $("hn-wd").textContent = WD[j1.getUTCDay()]; $("hn-time").textContent = hm(hoursAt(t1).s); }
-      var hs = Math.floor(Math.max(0, t1 - now) / 1000);
-      if ($("hc-d")) { $("hc-d").textContent = Math.floor(hs / 86400); $("hc-h").textContent = pad(Math.floor(hs % 86400 / 3600)); $("hc-m").textContent = pad(Math.floor(hs % 3600 / 60)); $("hc-s").textContent = pad(hs % 60); }
-    }
     if (!$("t-date")) return;
     var list = openList(now, 4), t = list[0], j = new Date(t + JST), diff = Math.max(0, t - now), s = Math.floor(diff / 1000), m = md(t);
     if (m !== lastMd) {
@@ -221,7 +305,7 @@ document.documentElement.classList.add("js");
     setNum("cd-d", String(Math.floor(s / 86400))); setNum("cd-h", pad(Math.floor(s % 86400 / 3600))); setNum("cd-m", pad(Math.floor(s % 3600 / 60))); setNum("cd-s", pad(s % 60));
     if (diff === 0 && $("t-note")) $("t-note").innerHTML = "<strong>ただいま診療中です。</strong> 会場へお越しください、患者さま♡";
   }
-  if ($("jst-clock") || $("t-date") || $("hn-date") || nextEls.length || cdEls.length) { tick(); setInterval(tick, 1000); }
+  if ($("jst-clock") || $("t-date")) { tick(); setInterval(tick, 1000); }
 
   /* ---------- SCHEDULE：カレンダー ---------- */
   var calBox = $("cal");
@@ -239,16 +323,16 @@ document.documentElement.classList.add("js");
         if (key === todayKey) cls += " --today";
         g += '<span class="' + cls + '"' + (sp ? ' title="' + esc(sp.d || (sp.k === "off" ? "休診" : hm(sp.s) + "–" + hm(sp.e))) + '"' : "") + ">" + d + (lab ? "<em>" + esc(lab) + "</em>" : "") + "</span>";
       }
-      html += '<div class="cal rv"><div class="cal__head"><b>' + Y + "." + pad(M + 1) + '</b><span class="mono">' + ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][M] + '</span></div><div class="cal__grid">' + g + "</div></div>";
+      html += '<div class="cal glass rv"><div class="cal__head"><b class="grad-text">' + Y + "." + pad(M + 1) + '</b><span class="mono">' + ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][M] + '</span></div><div class="cal__grid">' + g + "</div></div>";
     }
     calBox.innerHTML = html;
     var ev = $("events");
     if (ev) ev.innerHTML = Object.keys(SPECIAL).filter(function (k) { return k >= todayKey; }).sort().map(function (k) {
       var sp = SPECIAL[k], dt = new Date(k + "T00:00:00Z"), off = sp.k === "off";
       var desc = sp.d || (off ? "この日は休診です" : "特別診療です");
-      return '<li class="rv"><time>' + k.slice(5).replace("-", ".") + " " + WD[dt.getUTCDay()] + '</time><span class="tag' + (off ? " --off" : "") + '">' + esc(sp.t) + "</span><p>" + esc(desc) +
+      return '<li class="glass rv"><time>' + k.slice(5).replace("-", ".") + " " + WD[dt.getUTCDay()] + '</time><span class="tag' + (off ? " --off" : "") + '">' + esc(sp.t) + "</span><p>" + esc(desc) +
         (off ? "" : "<small>" + hm(sp.s) + "–" + hm(sp.e) + " JST</small>") + "</p></li>";
-    }).join("") || '<li class="--empty">予定されている特別診療・休診はありません。</li>';
+    }).join("") || '<li class="glass --empty">予定されている特別診療・休診はありません。</li>';
   }
 
   /* ---------- タブで絞り込み（MENU・FAQ） ---------- */
@@ -288,7 +372,7 @@ document.documentElement.classList.add("js");
       list.classList.remove("is-paging"); void list.offsetWidth; list.classList.add("is-paging");
       var old = shown(), h0 = list.offsetHeight, outMs = 240 + old.length * 22;
       old.forEach(function (it, k) {
-        it.animate([{ opacity: 1, transform: "none", filter: "blur(0)" }, { opacity: 0, transform: "translateX(" + (-dir * 46) + "rem) scale(.92)", filter: "blur(5px)" }],
+        it.animate([{ opacity: 1, transform: "none", filter: "blur(0)" }, { opacity: 0, transform: "translateX(" + (-dir * 46) + "rem) scale(.92) rotate(" + (-dir * 2) + "deg)", filter: "blur(5px)" }],
           { duration: 240, delay: k * 22, easing: "cubic-bezier(.55,0,.8,.2)", fill: "forwards" });
       });
       setTimeout(function () {
@@ -297,7 +381,7 @@ document.documentElement.classList.add("js");
         var now = shown(), h1 = list.offsetHeight;
         if (h1 !== h0) list.animate([{ height: h0 + "px" }, { height: h1 + "px" }], { duration: 420, easing: "cubic-bezier(.2,.8,.2,1)" });
         now.forEach(function (it, k) {
-          it.animate([{ opacity: 0, transform: "translate(" + (dir * 70) + "rem, 16rem) scale(.88)", filter: "blur(6px)" },
+          it.animate([{ opacity: 0, transform: "translate(" + (dir * 70) + "rem, 16rem) scale(.88) rotate(" + (dir * 3) + "deg)", filter: "blur(6px)" },
                       { opacity: 1, offset: .6, filter: "blur(0)" },
                       { opacity: 1, transform: "none", filter: "blur(0)" }],
             { duration: 560, delay: k * 55, easing: "cubic-bezier(.2,1.25,.35,1)", fill: "backwards" });
@@ -404,6 +488,23 @@ document.documentElement.classList.add("js");
     });
   }
 
+  /* ---------- トップ：はじめての患者さまへ（病院システムのダイアログ → 閉じるとデスクトップの「はじめに.txt」） ---------- */
+  var dlg = $("hero-dlg"), dIcon = $("hero-icon");
+  if (dlg && dIcon) {
+    var ss = function (k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } };
+    var toIcon = function (focusIcon) {
+      if (dlg.hidden) return;
+      ss("md-dlg", "1"); dlg.classList.add("is-closing");
+      setTimeout(function () { dlg.hidden = true; dIcon.hidden = false; dIcon.classList.add("is-new"); if (focusIcon) dIcon.focus(); }, reduce ? 0 : 360);
+    };
+    if (ss("md-dlg")) { dlg.hidden = true; dIcon.hidden = false; }
+    dlg.querySelectorAll("[data-dlg-close]").forEach(function (b) { b.addEventListener("click", function () { toIcon(true); }); });
+    // 「はい」でガイドを開き、ガイドを閉じたらダイアログはアイコンにしまう
+    var guide = $("modal"), wantIcon = false;
+    dlg.querySelector("[data-open-about]").addEventListener("click", function () { wantIcon = true; });
+    if (guide && "MutationObserver" in window) new MutationObserver(function () { if (wantIcon && guide.hidden) { wantIcon = false; toIcon(true); } }).observe(guide, { attributes: true, attributeFilter: ["hidden"] });
+  }
+
   /* ---------- はじめてのご来院ガイド（モーダル） ---------- */
   var modal = $("modal"), lastFocus;
   function closeModal() { if (!modal || modal.hidden) return; modal.hidden = true; if (lastFocus) lastFocus.focus(); }
@@ -456,7 +557,7 @@ document.documentElement.classList.add("js");
     /* ---- ハートがはじける ---- */
     function burst(x, y, n, spread) {
       if (reduce) return;
-      var cols = ["#f046ff", "#e9a6ff", "#46f0ff", "#a8f6ff", "#ffffff"];
+      var cols = ["#ff9cc6", "#f472a8", "#8fd3ff", "#c9b3f5", "#ffd36e"];
       for (var k = 0; k < n; k++) {
         var h = document.createElement("i"), a = Math.random() * Math.PI * 2, d = (spread || 120) * (.4 + Math.random() * .8);
         h.className = "md-pop"; h.style.cssText = "left:" + x + "px;top:" + y + "px;--c:" + cols[k % cols.length] + ";--dx:" + Math.cos(a) * d + "px;--dy:" + (Math.sin(a) * d - 40) + "px;--r:" + (Math.random() * 120 - 60) + "deg;--s:" + (.5 + Math.random() * .8);
@@ -482,21 +583,21 @@ document.documentElement.classList.add("js");
        1. 隠れハート（8ページに1こずつ）
        ========================================================= */
     var SPOTS = [
-      { id: "top", page: "index", label: "TOP", sel: "#news .hx", x: 97, y: 2 },
+      { id: "top", page: "index", label: "TOP", sel: "#news .sec-head", x: 97, y: 2 },
       { id: "about", page: "about", label: "ABOUT", sel: ".concept", x: 100, y: -4 },
       { id: "nurses", page: "nurses", label: "NURSES", sel: ".ctool", x: 99.5, y: 50 },
       { id: "schedule", page: "schedule", label: "SCHEDULE", sel: ".cal-wrap", x: 100, y: -3 },
       { id: "menu", page: "menu", label: "MENU", sel: ".rota", x: 94, y: 18 },
       { id: "media", page: "media", label: "MEDIA", sel: ".share", x: 7, y: 16 },
       { id: "guide", page: "guidelines", label: "GUIDELINES", sel: ".gl__doc", x: 50, y: 100 },
-      { id: "faq", page: "faq", label: "FAQ", sel: ".faq-more", x: 76, y: -18 }
+      { id: "faq", page: "faq", label: "FAQ", sel: ".faq-more", x: 76, y: 4 }
     ];
     var got = store.get("md-hearts", []).filter(function (id) { return SPOTS.some(function (p) { return p.id === id; }); });
     var isVip = function () { return got.length >= SPOTS.length; };
 
     var badge = document.createElement("button"); badge.type = "button"; badge.className = "md-badge"; badge.setAttribute("aria-label", "シークレットスタンプカードを開く");
     document.body.appendChild(badge);
-    var heroEl = document.querySelector(".kv");
+    var heroEl = document.querySelector(".hero");
     function badgePos() { badge.classList.toggle("--away", !!heroEl && scrollY < heroEl.offsetHeight * .7); }
     addEventListener("scroll", badgePos, { passive: true }); badgePos();
     function drawBadge() { badge.innerHTML = HEART + "<span><b>" + got.length + "</b><small>/" + SPOTS.length + "</small></span>"; badge.hidden = got.length === 0; badge.classList.toggle("--vip", isVip()); }
@@ -832,10 +933,10 @@ document.documentElement.classList.add("js");
     function omuBase() {
       var W = cv.width, H = cv.height, s = W / 520;
       cx2.setTransform(1, 0, 0, 1, 0, 0); cx2.clearRect(0, 0, W, H);
-      var g = cx2.createRadialGradient(W / 2, H * .52, W * .1, W / 2, H * .52, W * .48); g.addColorStop(0, "#2a1940"); g.addColorStop(.85, "#1b0f2b"); g.addColorStop(1, "#140a1f");
+      var g = cx2.createRadialGradient(W / 2, H * .52, W * .1, W / 2, H * .52, W * .48); g.addColorStop(0, "#ffffff"); g.addColorStop(.85, "#f6f2fb"); g.addColorStop(1, "#e3dcf2");
       cx2.fillStyle = g; cx2.beginPath(); cx2.ellipse(W / 2, H * .52, W * .47, H * .44, 0, 0, Math.PI * 2); cx2.fill();
-      cx2.strokeStyle = "#f046ff"; cx2.lineWidth = 6 * s; cx2.setLineDash([2 * s, 12 * s]); cx2.lineCap = "round"; cx2.beginPath(); cx2.ellipse(W / 2, H * .52, W * .43, H * .4, 0, 0, Math.PI * 2); cx2.stroke(); cx2.setLineDash([]);
-      cx2.fillStyle = "rgba(0,0,0,.35)"; cx2.beginPath(); cx2.ellipse(W / 2, H * .58, W * .33, H * .24, 0, 0, Math.PI * 2); cx2.fill();
+      cx2.strokeStyle = "#ffb3d1"; cx2.lineWidth = 6 * s; cx2.setLineDash([2 * s, 12 * s]); cx2.lineCap = "round"; cx2.beginPath(); cx2.ellipse(W / 2, H * .52, W * .43, H * .4, 0, 0, Math.PI * 2); cx2.stroke(); cx2.setLineDash([]);
+      cx2.fillStyle = "rgba(46,42,58,.10)"; cx2.beginPath(); cx2.ellipse(W / 2, H * .58, W * .33, H * .24, 0, 0, Math.PI * 2); cx2.fill();
       var e = cx2.createRadialGradient(W * .44, H * .42, W * .02, W / 2, H * .52, W * .36); e.addColorStop(0, "#fff6c2"); e.addColorStop(.5, "#ffd76a"); e.addColorStop(1, "#f2b33d");
       cx2.fillStyle = e; cx2.beginPath(); cx2.ellipse(W / 2, H * .53, W * .33, H * .24, -.04, 0, Math.PI * 2); cx2.fill();
       cx2.fillStyle = "rgba(255,255,255,.55)"; cx2.beginPath(); cx2.ellipse(W * .41, H * .43, W * .1, H * .035, -.3, 0, Math.PI * 2); cx2.fill();
@@ -883,17 +984,17 @@ document.documentElement.classList.add("js");
         ex.width = W; ex.height = H; g.drawImage(cv, 0, 0);
         if (im.complete && im.naturalWidth) {
           var r = 40 * s, x = W - r - 20 * s, y = H - r - 18 * s, H0 = 2 * r * im.naturalHeight / im.naturalWidth;
-          g.save(); g.shadowColor = "rgba(255,46,154,.55)"; g.shadowBlur = 14 * s; g.shadowOffsetY = 5 * s;
-          g.fillStyle = "#f046ff"; g.beginPath(); g.arc(x, y, r + 5 * s, 0, Math.PI * 2); g.fill(); g.restore();
+          g.save(); g.shadowColor = "rgba(46,42,58,.35)"; g.shadowBlur = 14 * s; g.shadowOffsetY = 5 * s;
+          g.fillStyle = "#fff"; g.beginPath(); g.arc(x, y, r + 5 * s, 0, Math.PI * 2); g.fill(); g.restore();
           g.save(); g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.clip();
-          var gr = g.createRadialGradient(x, y - r * .4, r * .1, x, y, r); gr.addColorStop(0, "#2a1940"); gr.addColorStop(1, omuMaid.c || "#3a0f33");
+          var gr = g.createRadialGradient(x, y - r * .4, r * .1, x, y, r); gr.addColorStop(0, "#fff"); gr.addColorStop(1, omuMaid.c || "#ffe3ef");
           g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r);
           g.drawImage(im, x - 1.5 * r, y - r - .06 * H0, 3 * r, 1.5 * H0); g.restore();
-          g.font = "700 " + 15 * s + "px 'Zen Kaku Gothic New', sans-serif"; g.textBaseline = "middle";
+          g.font = "700 " + 15 * s + "px 'IBM Plex Sans JP', sans-serif"; g.textBaseline = "middle";
           var t = "♡ " + omuMaid.n, tw = g.measureText(t).width, px = x - r - 14 * s - tw - 24 * s, ph = 30 * s;
-          g.fillStyle = "rgba(20,10,31,.92)"; g.beginPath();
+          g.fillStyle = "rgba(255,255,255,.94)"; g.beginPath();
           if (g.roundRect) g.roundRect(px, y - ph / 2, tw + 24 * s, ph, ph / 2); else g.rect(px, y - ph / 2, tw + 24 * s, ph);
-          g.fill(); g.fillStyle = "#e9a6ff"; g.fillText(t, px + 12 * s, y + 1 * s);
+          g.fill(); g.fillStyle = "#f472a8"; g.fillText(t, px + 12 * s, y + 1 * s);
         }
         return ex.toDataURL("image/png");
       } catch (err) { return cv.toDataURL("image/png"); }
@@ -947,7 +1048,15 @@ document.documentElement.classList.add("js");
         var hd = document.querySelector(".header"), ref = document.querySelector(".h-join") || document.querySelector(".h-x");
         if (hd) hd.insertBefore(openBadge, ref);
       }
-      var st = $("sys-status"); if (st) st.textContent = on ? "NOW OPEN" : "ONLINE";
+      var t = $("hero-title"); if (!t) return;
+      var lp = t.querySelector(".lines--pc"), ls = t.querySelector(".lines--sp");
+      if (on) {
+        titleBackup = titleBackup || { pc: lp.innerHTML, sp: ls.innerHTML, label: t.getAttribute("aria-label") };
+        lp.innerHTML = '<span class="fit">CLINIC <span class="g">NOW OPEN</span><i class="hero__cur"></i></span>';
+        ls.innerHTML = '<span class="fit">CLINIC</span><span class="fit"><span class="g">NOW OPEN</span><i class="hero__cur"></i></span>';
+        t.setAttribute("aria-label", "いらっしゃいませ、患者さま（ただいま開院中）");
+      } else if (titleBackup) { lp.innerHTML = titleBackup.pc; ls.innerHTML = titleBackup.sp; t.setAttribute("aria-label", titleBackup.label); }
+      fitTitle(); typeTitle();
     }
     onReady(checkOpen); setInterval(checkOpen, 30000);
 
@@ -979,37 +1088,10 @@ document.documentElement.classList.add("js");
   })();
 
   /* ---------- 出てくる動き＋見出しデコード ---------- */
-  var rvs = document.querySelectorAll(".rv");
   if ("IntersectionObserver" in window && !reduce) {
-    var vh = innerHeight;
-    rvs.forEach(function (el) { if (el.getBoundingClientRect().top < vh) el.classList.add("is-in"); });
-    root.classList.add("rv-on");
-    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -4% 0px" });
-    rvs.forEach(function (el) { if (!el.classList.contains("is-in")) io.observe(el); });
-  } else rvs.forEach(function (el) { el.classList.add("is-in"); });
-
-  /* ---------- 主役・第一級のパネルの枠（data-frame）：実寸の SVG の多角形で描くので、線の太さと 45° の面取りが崩れない ----------
-     JS が動く前は枠線が無いだけで、中身はそのまま読める。l ＝ 第一級（対角2カ所の面取り＋上辺のタブ＋一部だけの副線）／ hud ＝ VITAL MONITOR */
-  var SVGNS = "http://www.w3.org/2000/svg";
-  function drawFrame(el) {
-    var w = el.offsetWidth, h = el.offsetHeight; if (!w || !h) return;
-    /* 面取り（--fc）と線幅（--lw-std）は、CSS の scroll-margin に写した「計算済みの px」で受け取る */
-    var cs = getComputedStyle(el), c = Math.round(parseFloat(cs.scrollMarginTop) || 24), lw = parseFloat(cs.scrollMarginBottom) || 1.5, o = lw / 2;
-    var tx0 = Math.round(w * .1), tw = Math.round(Math.min(w * .26, 220)), td = Math.round(Math.max(4, c * .3));
-    /* 外形：左上と右下を c だけ切り、上辺に 45° のタブ（へこみ）を1つ */
-    var P = [[c, o], [tx0, o], [tx0 + td, td + o], [tx0 + tw - td, td + o], [tx0 + tw, o], [w - o, o], [w - o, h - c], [w - c, h - o], [o, h - o], [o, c]];
-    var pts = P.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ");
-    var g = 6, sub = "M" + (w + g) + " " + Math.round(h * .45) + "V" + (h - c + g * .41).toFixed(1) + "L" + (w - c + g * .41).toFixed(1) + " " + (h + g) + "H" + Math.round(w * .55);
-    var svg = el.querySelector(":scope > .frm");
-    if (!svg) { svg = document.createElementNS(SVGNS, "svg"); svg.setAttribute("class", "frm"); svg.setAttribute("aria-hidden", "true"); el.insertBefore(svg, el.firstChild); }
-    svg.setAttribute("viewBox", "0 0 " + w + " " + h); svg.setAttribute("width", w); svg.setAttribute("height", h);
-    svg.innerHTML = '<polygon class="frm__face" points="' + pts + '"/><polygon class="frm__line" points="' + pts + '"/><path class="frm__sub" d="' + sub + '"/>';
-    el.classList.add("is-framed");
-  }
-  var frames = document.querySelectorAll("[data-frame]");
-  window.mdFrame = function (scope) { (scope || document).querySelectorAll("[data-frame]").forEach(function (el) { drawFrame(el); if (fro) fro.observe(el); }); };
-  var fro = "ResizeObserver" in window ? new ResizeObserver(function (es) { es.forEach(function (e) { drawFrame(e.target); }); }) : null;
-  frames.forEach(function (el) { drawFrame(el); if (fro) fro.observe(el); });
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-in"); var t = e.target.querySelector(".sec-head__en, .faq__label b, .sub-h b"); if (t) scramble(t, 800); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -6% 0px" });
+    document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
+  } else document.querySelectorAll(".rv").forEach(function (el) { el.classList.add("is-in"); });
 
   /* ---------- 画面遷移：サイト内のページへ移るとき、ロード画面と同じ色の帯で覆ってから移動する ----------
      前のページから来たときは <head> のスクリプトが html に pt-arrive を付けて覆った状態で始まるので、ここで帯を抜く */
@@ -1045,11 +1127,17 @@ document.documentElement.classList.add("js");
   /* 起動演出は最初に開いたときだけ。サイト内の画面遷移でトップに来たときは、帯が抜ける演出だけにする */
   if (!loader || reduce || arrived) { if (loader) loader.classList.add("is-gone"); if (arrived) setTimeout(setReady, 450); else setReady(); }
   else (function () {
-    var fill = $("ld-fill"), num = $("ld-pct"), logs = loader.querySelectorAll("#ld-log li");
+    var hearts = $("ld-hearts"), cols = ["#ff9cc6", "#f472a8", "#8fd3ff", "#c9b3f5", "#ffc2dc"];
+    for (var h = 0; h < 14; h++) {
+      var hi = document.createElement("i");
+      hi.style.cssText = "left:" + ((h * 37 + 7) % 100) + "%;--c:" + cols[h % cols.length] + ";--s:" + (.35 + (h * 13 % 10) / 14) + ";--d:" + (3.2 + (h * 7 % 5) * .55) + "s;--dl:" + (-(h * 0.43) % 4).toFixed(2) + "s;--r:" + ((h * 23 % 40) - 20) + "deg";
+      hearts.appendChild(hi);
+    }
+    var fill = $("ld-fill"), chibi = $("ld-chibi"), num = $("ld-pct"), logs = loader.querySelectorAll("#ld-log li");
     var STEPS = [1, 24, 50, 74, 97], pct = 0, start = performance.now(), MIN = 3900, MAX = 6500, loaded = document.readyState === "complete", state = 0;
     addEventListener("load", function () { loaded = true; });
     var render = function () {
-      fill.style.width = pct + "%"; loader.style.setProperty("--p", pct / 100);
+      fill.style.width = pct + "%"; chibi.style.left = pct + "%";
       num.textContent = String(Math.round(pct)).padStart(3, "0");
       logs.forEach(function (li, k) { if (pct >= STEPS[k]) li.classList.add("is-show"); });
     };
@@ -1076,39 +1164,13 @@ document.documentElement.classList.add("js");
     })(start);
   })();
 
-  /* ---------- トップ：ファーストビューを過ぎたらヘッダーを出す ---------- */
-  var kv = $("kv");
-  if (kv) {
-    var kvPast = function () { document.body.classList.toggle("kv-past", scrollY > kv.offsetHeight * .72); };
-    addEventListener("scroll", kvPast, { passive: true }); kvPast();
+  /* ---------- 読み込み時 ---------- */
+  if ($("hero-title")) {
+    fitTitle();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitle);
+    var rt; addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(fitTitle, 120); });
+    onReady(function () { setTimeout(introTitle, 250); });
   }
-
-  /* ---------- 準備中のリンク（href="#"）は押しても動かない ---------- */
-  document.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest('a[aria-disabled="true"]'); if (a) e.preventDefault(); });
-
-  /* ---------- トップ：画面の端のグリッチノイズ（低解像度の canvas に、色とりどりの横長の欠片をときどき描く） ---------- */
-  var nz = $("kv-noise");
-  if (nz && nz.getContext) {
-    var g = nz.getContext("2d"), NW = 240, NH = 150, COLS = ["#f046ff", "#f046ff", "#46f0ff", "#e9a6ff", "#ffffff"], vis = true;
-    nz.width = NW; nz.height = NH;
-    var drawNoise = function (burst) {
-      g.clearRect(0, 0, NW, NH);
-      var n = burst ? 90 : 34;
-      for (var k = 0; k < n; k++) {
-        var edge = Math.random(), x, y = Math.floor(Math.random() * NH);
-        x = edge < .42 ? Math.random() * 30 : edge < .84 ? NW - Math.random() * 34 : Math.random() * NW;
-        if (edge >= .84 && y > 14 && y < NH - 14) y = Math.random() < .5 ? Math.random() * 12 : NH - Math.random() * 12;
-        g.globalAlpha = .25 + Math.random() * .6; g.fillStyle = COLS[k % COLS.length];
-        g.fillRect(Math.floor(x), Math.floor(y), 1 + Math.floor(Math.random() * (burst ? 14 : 6)), 1);
-      }
-    };
-    drawNoise(false);
-    if (!reduce) {
-      if ("IntersectionObserver" in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }).observe(nz);
-      (function loop() {
-        if (vis && !document.hidden) { var b = Math.random() < .08; drawNoise(b); nz.classList.toggle("is-burst", b); }
-        setTimeout(loop, 140 + Math.random() * 260);
-      })();
-    }
-  }
+  var ph = document.querySelector(".phead__en");
+  if (ph) setTimeout(function () { scramble(ph, 800); }, 150);
 })();

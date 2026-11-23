@@ -1,21 +1,22 @@
 {{PHEAD}}
 
   <section class="sub-sec">
+    <div class="fx" data-fx="sub" aria-hidden="true"></div>
     <div class="inner">
       <div class="sbento">
-        <div class="ticket fr --l rv" data-frame="l">
-          <div class="ticket__head mono"><span>PATIENT CARD // NEXT VISIT</span><span class="tag">SC-CARD</span></div>
-          <p class="ticket__date mono" id="t-date">12.07<small>MON</small></p>
-          <p class="ticket__time mono">21:50 — 23:10 JST</p>
-          <div class="count mono" aria-live="polite">
+        <div class="ticket glass rv">
+          <span class="holo" aria-hidden="true"></span>
+          <div class="ticket__head mono"><span>PATIENT CARD // NEXT VISIT</span><span>SUCCUBUS CLINIC</span></div>
+          <p class="ticket__date grad-text" id="t-date">12.07<small>MON</small></p>
+          <p class="ticket__time">21:50 — 23:10 JST</p>
+          <div class="count" aria-live="polite">
             <div><b id="cd-d">0</b><span>DAYS</span></div><div><b id="cd-h">00</b><span>HOURS</span></div><div><b id="cd-m">00</b><span>MIN</span></div><div><b id="cd-s">00</b><span>SEC</span></div>
           </div>
-          <div class="syr" aria-hidden="true"><span class="mono">DOSE</span><span class="syr__tube"><i class="syr__fill" id="syr-fill"></i></span><span class="mono" id="syr-pct">--%</span></div>
           <p class="ticket__note" id="t-note"><strong>21:50</strong> になったら会場へ！<br>会場・参加方法は準備中です（公式Xで発表予定）。</p>
-          <svg class="ticket__code" aria-hidden="true"><use href="#d-bars"/></svg>
+          <div class="ticket__code mono" aria-hidden="true"><i></i><span>SC-CARD-0001</span></div>
         </div>
-        <div class="bcard fr --3 b-upcoming rv"><p class="bcard__label"><span class="tag">UPCOMING</span><b>これからの診療日</b></p><ul class="upcoming mono" id="upcoming"></ul></div>
-        <div class="bcard fr b-spec rv"><p class="bcard__label"><span class="tag">INFO</span><b>診療のご案内</b></p>
+        <div class="bcard glass b-upcoming rv"><p class="bcard__label mono"><span>UPCOMING</span><b>これからの診療日</b></p><ul class="upcoming" id="upcoming"></ul></div>
+        <div class="bcard glass b-spec rv"><p class="bcard__label mono"><span>INFORMATION</span><b>診療のご案内</b></p>
           <dl class="spec">
             <div><dt>DAY</dt><dd>隔週月曜日（2026年12月7日スタート／一部特別診療の場合あり）</dd></div>
             <div><dt>TIME</dt><dd><span class="num">21:50 – 23:10</span>（日本時間）</dd></div>
@@ -30,28 +31,28 @@
 
   <section class="sub-sec">
     <div class="inner">
-      <div class="sub-h rv"><b class="neon --p">Calendar</b><span>診療カレンダー</span><i></i></div>
+      <div class="sub-h rv"><b class="grad-text">CALENDAR</b><span>診療カレンダー</span><i></i></div>
       <div class="cal-wrap" id="cal"></div>
-      <div class="cal__legend rv"><span><i class="--open"></i>通常診療（隔週月曜 21:50–23:10）</span><span><i class="--sp"></i>特別診療・イベント</span><span><i class="--off"></i>休診</span></div>
+      <div class="cal__legend rv"><span><i style="background:var(--sky-d)"></i>通常診療（隔週月曜 21:50–23:10）</span><span><i style="background:var(--grad)"></i>特別診療・イベント</span><span><i style="background:#9b95a8"></i>休診</span></div>
     </div>
   </section>
 
   <section class="sub-sec">
     <div class="inner">
-      <div class="sub-h rv"><b class="neon --c">Events</b><span>特別診療・休診のお知らせ</span><i></i></div>
+      <div class="sub-h rv"><b class="grad-text">EVENTS</b><span>特別診療・休診のお知らせ</span><i></i></div>
       <ul class="events" id="events"></ul>
     </div>
   </section>
 
   <section class="sub-sec">
     <div class="inner">
-      <div class="sub-h rv"><b class="neon --p">How to Visit</b><span>ご来院までの流れ</span><i></i></div>
-      <ol class="steps">
-        <li class="step rv"><span class="ntag">01</span><h3>受付</h3><p>会場や参加方法は準備中です。<br>決まりしだい公式Xでお知らせします</p></li>
-        <li class="step rv"><span class="ntag">02</span><h3>ご来院</h3><p>21:50になったら会場へお越しください！</p></li>
-        <li class="step rv"><span class="ntag">03</span><h3>問診～処方</h3><p>小悪魔なナースが患者さまをお出迎え♡<br>元気になれる処方メニューをお届けします！</p></li>
-        <li class="step rv"><span class="ntag">04</span><h3>お大事に</h3><p>23:10ごろにお見送り。<br>最後にナースとごあいさつしましょう！</p></li>
-      </ol>
+      <div class="sub-h rv"><b class="grad-text">HOW TO VISIT</b><span>ご来院までの流れ</span><i></i></div>
+      <div class="sbento">
+        <div class="bcard glass b-step rv"><h3>受付</h3><p>会場や参加方法は準備中です。<br>決まりしだい公式Xでお知らせします</p></div>
+        <div class="bcard glass b-step rv"><h3>ご来院</h3><p>21:50になったら会場へお越しください！</p></div>
+        <div class="bcard glass b-step rv"><h3>問診～処方</h3><p>小悪魔なナースが患者さまをお出迎え♡<br>元気になれる処方メニューをお届けします！</p></div>
+        <div class="bcard glass b-step rv"><h3>お大事に</h3><p>23:10ごろにお見送り。<br>最後にナースとごあいさつしましょう！</p></div>
+      </div>
     </div>
   </section>
 

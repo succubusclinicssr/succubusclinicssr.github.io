@@ -1,15 +1,16 @@
 {{PHEAD}}
 
   <section class="sub-sec">
+    <div class="fx" data-fx="sub" aria-hidden="true"></div>
     <div class="inner">
       <p class="phead__lead rv" style="margin:0 auto 40rem;text-align:center">SuccubusClinicのナースたちの写真や動画をまとめています。<br>写真は押すと大きく、動画は押すとYouTubeで再生されます。</p>
-      <nav class="mjump rv" aria-label="ページ内リンク"><a href="#photo"><b>Photo</b><small>写真</small></a><a href="#movie"><b>Movie</b><small>動画</small></a><a href="#share"><b>Share</b><small>みんなの投稿</small></a></nav>
+      <nav class="mjump rv" aria-label="ページ内リンク"><a href="#photo"><b>PHOTO</b><small>写真</small></a><a href="#movie"><b>MOVIE</b><small>動画</small></a><a href="#share"><b>SHARE</b><small>みんなの投稿</small></a></nav>
     </div>
   </section>
 
   <section class="sub-sec" id="photo">
     <div class="inner">
-      <div class="sub-h rv"><b class="neon --p">Photo</b><span>写真（{{PHOTON}}枚）</span><i></i></div>
+      <div class="sub-h rv"><b class="grad-text">PHOTO</b><span>写真（{{PHOTON}}枚）</span><i></i></div>
       <ul class="media-grid" id="gallery" data-per="8">
 {{GALLERY}}
       </ul>
@@ -19,7 +20,7 @@
 
   <section class="sub-sec" id="movie">
     <div class="inner">
-      <div class="sub-h rv"><b class="neon --c">Movie</b><span>動画（{{MOVIEN}}本）</span><i></i></div>
+      <div class="sub-h rv"><b class="grad-text">MOVIE</b><span>動画（{{MOVIEN}}本）</span><i></i></div>
       <div class="tabs rv" role="tablist" aria-label="タグで絞り込む" data-filter=".mvlist > li" data-empty="mv-empty">{{MOVIETABS}}</div>
       <ul class="mvlist">
 {{MOVIES}}
