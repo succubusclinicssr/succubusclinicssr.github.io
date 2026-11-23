@@ -4,13 +4,16 @@
     <div class="fx" data-fx="sub" aria-hidden="true"></div>
     <div class="inner">
       <div class="tabs rv" id="news-tabs" role="tablist" aria-label="カテゴリで絞り込む"></div>
-      <!-- バインダー（クリップボード）にはさんだ用紙。1件＝記入欄1行（中身は site.js） -->
+      <!-- 電子問診票（受付端末の画面）。1件＝チェックリストの1行（中身は site.js）。番号と下の帯の件数は CSS のカウンター -->
       <div class="qboard --page rv">
-        <span class="qboard__clip" aria-hidden="true"></span>
         <div class="qsheet">
-          <p class="qsheet__count" id="nwin-count"></p>
-          <div class="qhead" aria-hidden="true"><span></span><span>タイトル</span><span>種類</span><span>日付</span></div>
+          <div class="mq-head">
+            <p class="mq-title" aria-hidden="true"><b>問診票</b><span>MEDICAL INTERVIEW SHEET</span></p>
+            <div class="mq-fields"><span class="mq-field --no" aria-hidden="true"><i>受付番号</i><b>SC-NEWS</b></span><span class="mq-field"><i aria-hidden="true">件数</i><b id="nwin-count"></b></span></div>
+            <div class="mq-cols" aria-hidden="true"><span>No.</span><span></span><span>件名</span><span>種類</span><span>日付</span></div>
+          </div>
           <div class="nlist qform" id="nlist" aria-live="polite"></div>
+          <div class="mq-foot" aria-hidden="true"><span class="mq-foot__l"></span><i class="mq-foot__cur"></i><span class="mq-foot__r"></span></div>
         </div>
       </div>
       <nav class="pager" id="pager" aria-label="ページ送り"></nav>

@@ -23,8 +23,8 @@ document.documentElement.classList.add("js");
     return '<div class="th ' + t.cls + '"><span>' + t.t + (t.s ? "<small>" + t.s + "</small>" : "") + "</span></div>";
   }
 
-  /* ---------- お知らせの「記入欄」1行（トップとNEWS一覧で共通）----------
-     左にチェック欄、タイトル（罫線の上の答え）、種類（選んだものを丸で囲む。ほかの選択肢は飾りなので読み上げない）、日付欄 */
+  /* ---------- お知らせの1行（トップとNEWS一覧で共通）----------
+     番号（CSS）・チェック欄・件名・種類（選んだものだけ表示。ほかの選択肢は隠して読み上げない）・日付 */
   function qrow(n) {
     var opts = Object.keys(CAT).map(function (k) {
       var on = k === n.cat;
@@ -33,19 +33,20 @@ document.documentElement.classList.add("js");
     return '<a class="qrow --' + n.cat + '" href="' + link(n) + '"><span class="qrow__box" aria-hidden="true"></span><span class="qrow__title">' + esc(n.title) +
       '</span><span class="qrow__cat">' + opts + '</span><span class="qrow__date">' + n.date + "</span></a>";
   }
-  /* 空の記入欄（件数が少なくても用紙が埋まって見えるようにする飾り。読み上げ・操作の対象にしない） */
-  function qblank(k) {
-    var h = ""; for (var i = 0; i < k; i++) h += '<span class="qrow --blank"><span class="qrow__box"></span></span>';
-    return k > 0 ? '<div class="qblank" aria-hidden="true">' + h + "</div>" : "";
+  /* 問診票のタイトルバー（トップ用。お知らせページは news.html に同じ形を直接書いている）と、下のステータスの帯（飾りなので読み上げない） */
+  function mqHead(count) {
+    return '<div class="mq-head"><p class="mq-title" aria-hidden="true"><b>問診票</b><span>MEDICAL INTERVIEW SHEET</span></p>' +
+      '<div class="mq-fields"><span class="mq-field --no" aria-hidden="true"><i>受付番号</i><b>SC-NEWS</b></span><span class="mq-field"><i aria-hidden="true">件数</i><b>' + count + " 件</b></span></div></div>";
   }
+  var MQ_FOOT = '<div class="mq-foot" aria-hidden="true"><span class="mq-foot__l"></span><i class="mq-foot__cur"></i><span class="mq-foot__r"></span></div>';
 
-  /* ---------- トップ：お知らせ（バインダーにはさんだ用紙＋クリップで留めた添付写真） ---------- */
+  /* ---------- トップ：お知らせ（電子問診票：タイトルバー・添付のプレビュー・一覧・ステータスの帯） ---------- */
   var bento = $("news-bento");
   if (bento) {
     var TOPN = 5, tops = NEWS.slice(0, TOPN), f = tops[0];
-    bento.innerHTML = '<div class="qboard --top rv"><span class="qboard__clip" aria-hidden="true"></span><div class="qsheet">' +
-      (f ? '<a class="qphoto" href="' + link(f) + '" tabindex="-1" aria-hidden="true"><span class="qphoto__clip"></span><span class="qphoto__img">' + thumb(f) + "</span></a>" : "") +
-      '<div class="qform">' + tops.map(qrow).join("") + qblank(TOPN - tops.length) + "</div></div></div>";
+    bento.innerHTML = '<div class="qboard --top rv"><div class="qsheet">' + mqHead(tops.length) +
+      (f ? '<a class="qphoto" href="' + link(f) + '" tabindex="-1" aria-hidden="true"><span class="qphoto__img">' + thumb(f) + "</span></a>" : "") +
+      '<div class="qform">' + tops.map(qrow).join("") + "</div>" + MQ_FOOT + "</div></div>";
     // 6件目以降は「VIEW ALL」から（用紙の行にまとめたので、下の文字だけの一覧は使わない）
     if ($("news-list")) $("news-list").hidden = true;
   }
@@ -65,9 +66,9 @@ document.documentElement.classList.add("js");
       var list = NEWS.filter(function (n) { return cur === "all" || n.cat === cur; }), pages = Math.max(1, Math.ceil(list.length / PER));
       page = Math.min(page, pages);
       [].forEach.call(tabs.children, function (b) { b.setAttribute("aria-selected", b.dataset.cat === cur); });
-      /* 用紙の記入欄の形：チェック欄・タイトル・種類・日付。1ページ分（PER 行）に足りないぶんは空の記入欄で埋める */
+      /* 1ページ分（PER 行）の行を描く。空の行は足さない（番号は CSS のカウンター） */
       var shown = list.slice((page - 1) * PER, page * PER);
-      nlist.innerHTML = (shown.map(qrow).join("") || '<p class="empty">このカテゴリのお知らせはまだありません。</p>') + qblank(PER - Math.max(shown.length, 1));
+      nlist.innerHTML = shown.map(qrow).join("") || '<p class="empty">このカテゴリのお知らせはまだありません。</p>';
       var cnt = $("nwin-count"); if (cnt) cnt.textContent = list.length + " 件";
       var h = '<button type="button" class="--prev" aria-label="前のページ" data-p="' + (page - 1) + '"' + (page === 1 ? " disabled" : "") + ">" + ARROW + "</button>";
       for (var p = 1; p <= pages; p++) h += '<button type="button" data-p="' + p + '"' + (p === page ? ' aria-current="page"' : "") + ">" + p + "</button>";
