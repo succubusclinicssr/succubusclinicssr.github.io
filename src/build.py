@@ -20,6 +20,7 @@ OFFLINE = os.environ.get("OFFLINE") == "1"   # 1 のとき YouTube へ取りに�
 EVENT = "SuccubusClinic"                         # 短く書くときの名前
 EVENT_FULL = "SuccubusClinic -えすえすあーる-"     # 正式な名前（「えすえすあーる」はひらがなのまま）
 PUBLIC_URL = "https://succubusclinicssr.github.io"  # 公開URL（GitHub Actions では環境変数 SITE_URL が優先されます）
+NOINDEX = True     # 検索よけ。True のあいだは、検索サイトに「このサイトを載せないで」と伝えます。イベントを発表したら False にしてください
 GROUP_URL = "#"    # VRChat グループの URL（未定のあいだは "#"）
 X_URL = "#"        # 公式 X の URL（例 "https://x.com/xxxx"。未定のあいだは "#"）
 X_ID = ""          # 公式 X の ID（@ は付けない。未定のあいだは空 → 「準備中」と表示、twitter:site も出さない）
@@ -505,6 +506,7 @@ def head_meta(name, title, desc):
     ogimg = f"{SITE_URL}/img/ogp.jpg" if SITE_URL else "img/ogp.jpg"
     return "\n".join(filter(None, [
         f'<meta name="description" content="{esc(desc)}">',
+        '<meta name="robots" content="noindex, nofollow">' if NOINDEX else "",
         f'<link rel="canonical" href="{url}">' if url else "",
         f'<meta property="og:site_name" content="{esc(EVENT_FULL)}">',
         f'<meta property="og:type" content="{"website" if name == "index" else "article"}">',
@@ -807,10 +809,13 @@ def write_js(D):
 
 def write_extras():
     open(os.path.join(OUT, ".nojekyll"), "w").write("")
-    if SITE_URL:
+    if SITE_URL and not NOINDEX:
         urls = "".join(f"<url><loc>{SITE_URL}/{'' if n == 'index' else n + '.html'}</loc></url>" for n in PAGES if n != "news-detail")
         open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
         open(os.path.join(OUT, "robots.txt"), "w", encoding="utf-8").write(f"User-agent: *\nDisallow: /admin/\nSitemap: {SITE_URL}/sitemap.xml\n")
+    elif NOINDEX:
+        # 検索よけの間はサイトマップを出さない。巡回そのものは止めない（止めると、各ページの「載せないで」の指定を読んでもらえないため）
+        open(os.path.join(OUT, "robots.txt"), "w", encoding="utf-8").write("User-agent: *\nDisallow: /admin/\n")
     shutil.copytree(os.path.join(ROOT, "admin"), os.path.join(OUT, "admin"))
     # 管理画面の設定に、リポジトリ名とサイトのURLを自動で書き入れる（GitHub Actions が教えてくれる）
     cfg_path = os.path.join(OUT, "admin", "config.yml"); cfg = open(cfg_path, encoding="utf-8").read()
