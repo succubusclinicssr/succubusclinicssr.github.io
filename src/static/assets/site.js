@@ -1196,6 +1196,229 @@ document.documentElement.classList.add("js");
     })(start);
   })();
 
+  /* ---------- トップ：ナースの壁（見る人を囲むように内側へ曲がる立体のカルーセル） ----------
+     平らな写真のパネルを、見る人を軸にした円弧に内向きに並べる（中央がいちばん奥で小さく、左右ほど手前で大きい）。
+     円弧は 1 周ぶんのスロット（S 個）で閉じていて、回した量 p（パネル何枚ぶんかの連続値。中央が p 番目）に対し、
+     スロット i には k = i + S×round((p − i)/S) 番目のナース（MD_CAST[k を人数で割った余り]）を出す。
+     見えるのは軸より奥（±90°以内）だけ。差し替えは見る人の後ろ側で起きるので見えない。
+     ドラッグ（つかんだ点がポインタの下にとどまる。離すと惰性→中央に吸いつく）・横ホイール・前へ／次へ・矢印キー・スペースで一時停止。
+     自動の動きは、マウスを乗せている間・キーボードの focus が中にある間・操作の直後・画面外・裏のタブ・一時停止中は止める */
+  var RING = {
+    aspect: 0.67,       // パネルの幅÷高さ（0.67＝縦長 2:3）。写真はこの形に切り抜く
+    size: 0.74,         // 中央のパネルの高さが、題名より上の舞台（.ring__view。高さは CSS）の高さに占める割合
+    curvature: 0.62,    // 壁の曲がりの強さ（0 平ら〜1 きつい筒）。となりとの角度 ≒ curvature×40°。1 周で閉じるよう、スロット数＝360÷その角度を丸めた数
+    distance: 4.4,      // 見る人から壁までの距離（中央のパネルの高さ何枚ぶんか）。perspective になる。小さいほど遠近が強い
+    tilt: 0,            // 見上げ・見下ろしの角度（度。0 は水平）
+    gap: 13,            // パネルのすき間（中央のパネルの位置で。PC の px。スマホは rem で縮む）
+    radius: 17,         // パネルの角の丸み（同上）
+    reflection: 0.23,   // 床の映りこみの強さ（0 で無し）
+    dim: 0.35,          // 左右のはしへ向かって白くかすませる強さ（いちばん外側でこの値）
+    autoplay: "drift",  // "drift" ゆっくり回り続ける／"step" interval 秒ごとに 1 枚／"off" 自動で動かさない
+    speed: 0.16,        // drift の速さ（1 秒あたりのパネル数）
+    interval: 5.5,      // step の間隔（秒）
+    inertia: 0.72,      // はじいたときにどれだけ流れるか（0〜1）
+    snap: true,         // 止まるとき、パネルが中央に来るように吸いつく
+    pauseOnHover: true  // マウスを乗せている間は自動の動きを止める
+  };
+  var ring = $("ring"), RC = window.MD_CAST || [];
+  if (ring && RC.length) (function () {
+    var view = $("ring-view"), spin = $("ring-spin"), now = $("ring-now"), count = $("ring-count"), playBtn = $("ring-play");
+    var N = RC.length, S = Math.max(6, Math.round(360 / (Math.max(0.05, RING.curvature) * 40))), A = 360 / S, QUAR = S / 4, slots = [], unit = 200;
+    var p = 0, vel = 0, target = null, raf = 0, last = 0, front = null, ptr = null, drag = false, moved = false, wheeling = false, wheelT, stepT;
+    var userPaused = reduce || RING.autoplay === "off", hover = false, focused = false, inView = false, seen = false, idleUntil = 0, idleT;
+    var mod = function (a, b) { return ((a % b) + b) % b; };
+    var noOf = function (d) { return "No." + d.id.replace(/\D/g, ""); };
+    ring.hidden = false;
+    if (userPaused) playBtn.hidden = true;
+
+    // 設定から寸法を出して CSS の変数に入れる（舞台の高さが変わったら呼び直す）
+    function layout() {
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 1;
+      var h = view.clientHeight * RING.size, w = h * RING.aspect, gap = RING.gap * rem;
+      var r = (w + gap) / (2 * Math.tan(A / 2 * Math.PI / 180));
+      unit = w + gap;                                             // 中央のパネル 1 枚ぶんの横の長さ（px）
+      [["--w", w], ["--h", h], ["--r", r], ["--persp", RING.distance * h], ["--rad", RING.radius * rem]].forEach(function (v) { ring.style.setProperty(v[0], v[1].toFixed(1) + "px"); });
+      ring.style.setProperty("--a", A + "deg"); ring.style.setProperty("--tilt", RING.tilt + "deg"); ring.style.setProperty("--ref", RING.reflection);
+    }
+    function build() {
+      for (var i = 0; i < S; i++) {
+        var a = document.createElement("a");
+        a.className = "ring__card"; a.draggable = false; a.style.setProperty("--i", i);
+        a.innerHTML = '<span class="ring__ph"><img alt="" width="400" height="601" decoding="async" draggable="false"></span>' +
+          '<span class="ring__ref" aria-hidden="true"><img alt="" width="400" height="601" decoding="async" draggable="false"></span>';
+        spin.appendChild(a);
+        var im = a.querySelectorAll("img");
+        slots.push({ el: a, i: i, k: null, img: im[0], ref: im[1] });
+      }
+      render();
+    }
+    // スロットに k 番目のナースを入れる（写真は、見えている位置にあり、壁が画面の近くに来てから読みこむ）
+    function fill(s, k) {
+      var d = RC[mod(k, N)];
+      s.k = k; s.want = "img/cast/s/" + d.id + ".webp";
+      s.el.href = "nurses.html#" + d.id;
+      s.el.setAttribute("aria-label", noOf(d) + " " + d.n);
+      s.el.style.setProperty("--c", d.c);
+    }
+    function render() {
+      spin.style.setProperty("--rot", (p * A).toFixed(3) + "deg");
+      slots.forEach(function (s) {
+        var k = s.i + S * Math.round((p - s.i) / S);
+        if (k !== s.k) fill(s, k);
+        var r = Math.abs(k - p), vis = r < QUAR - 0.05;            // 中央から何枚ぶん離れているか。±90° より手前（見る人の後ろ）は出さない
+        s.el.style.visibility = vis ? "" : "hidden";
+        if (!vis) return;
+        s.el.style.setProperty("--hz", (RING.dim * Math.min(1, r / Math.max(1, QUAR - 0.75))).toFixed(3));   // 左右ほど白くかすむ
+        if (seen && s.src !== s.want) { s.src = s.want; s.img.src = s.ref.src = s.want; }
+      });
+      var f = Math.round(p);
+      if (f !== front) setFront(f);
+    }
+    // 中央のパネルだけをリンクとして読み上げ・focus できるようにし、下に名前と番号を出す
+    function setFront(f) {
+      var had = document.activeElement && document.activeElement.classList.contains("ring__card"), d = RC[mod(f, N)];
+      front = f;
+      slots.forEach(function (s) {
+        var on = s.k === f;
+        s.el.classList.toggle("is-front", on);
+        if (on) { s.el.removeAttribute("aria-hidden"); s.el.removeAttribute("tabindex"); if (had) s.el.focus({ preventScroll: true }); }
+        else { s.el.setAttribute("aria-hidden", "true"); s.el.tabIndex = -1; }
+      });
+      now.innerHTML = '<span class="ring__now-nm">' + esc(d.n) + "</span>" + (d.t ? '<span class="ring__now-t">' + esc(d.t) + "</span>" : "");
+      count.innerHTML = "<b>" + pad(mod(f, N) + 1) + "</b> / " + pad(N);
+    }
+
+    function autoOn() {
+      return !userPaused && !(hover && RING.pauseOnHover) && !focused && !ptr && !wheeling && inView && !document.hidden && performance.now() >= idleUntil;
+    }
+    function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); } }
+    // step のとき：interval 秒ごとに 1 枚（rAF は動いている間だけ）
+    function stepTimer(on) {
+      clearTimeout(stepT);
+      if (on && RING.autoplay === "step") stepT = setTimeout(function () { if (autoOn()) goTo(Math.round(p) + 1); stepTimer(autoOn()); }, RING.interval * 1000);
+    }
+    // 止める条件が変わったとき：止まるなら、いちばん近いパネルへ吸いつく
+    function update() {
+      var on = autoOn();
+      now.setAttribute("aria-live", on ? "off" : "polite");      // 自動で動いている間は読み上げない
+      stepTimer(on);
+      if (!on && target === null && !drag && !wheeling && RING.snap) target = Math.round(p);
+      if (reduce && target !== null) { p = target; target = null; vel = 0; render(); return; }
+      kick();
+    }
+    function tick(t) {
+      var dt = Math.min(0.05, (t - last) / 1000), go = false, drift = RING.autoplay === "drift";
+      last = t; raf = 0;
+      if (!drag) {
+        if (target !== null) {
+          // 臨界減衰のばねで target へ（離したときの勢いを vel に持ちこむ）
+          var w = 9;
+          vel += (-w * w * (p - target) - 2 * w * vel) * dt; p += vel * dt;
+          if (Math.abs(p - target) < 0.002 && Math.abs(vel) < 0.02) { p = target; vel = 0; target = null; go = drift && autoOn(); } else go = true;
+        } else if (drift && autoOn()) { p += RING.speed * dt; vel = RING.speed; go = true; }
+      }
+      render();
+      if (go) raf = requestAnimationFrame(tick);
+    }
+    function goTo(k) {
+      target = k;
+      if (reduce) { p = k; target = null; vel = 0; render(); } else kick();
+    }
+    // 操作の直後は 3 秒ほど自動回転を待つ
+    function poke() { idleUntil = performance.now() + 3000; clearTimeout(idleT); idleT = setTimeout(update, 3050); update(); }
+    function step(d) { goTo((target !== null ? target : Math.round(p)) + d); poke(); }
+
+    /* ドラッグ（マウス・タッチ）。縦のスクロールはブラウザにまかせる（CSS の touch-action: pan-y） */
+    view.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0 || ptr) return;
+      moved = false; ptr = { id: e.pointerId, x: e.clientX, p: p, w: unit, hist: [] };
+      update();
+    });
+    view.addEventListener("pointermove", function (e) {
+      if (!ptr || e.pointerId !== ptr.id) return;
+      var dx = e.clientX - ptr.x;
+      if (!drag) {
+        if (Math.abs(dx) < 6) return;
+        drag = moved = true; target = null; vel = 0; ptr.x = e.clientX; ptr.p = p; dx = 0;
+        view.classList.add("is-drag");
+        try { view.setPointerCapture(e.pointerId); } catch (er) {}
+      }
+      p = ptr.p - dx / ptr.w;
+      ptr.hist.push([e.timeStamp, p]);
+      while (ptr.hist.length > 2 && e.timeStamp - ptr.hist[0][0] > 100) ptr.hist.shift();
+      render();
+    });
+    function release(e) {
+      if (!ptr || e.pointerId !== ptr.id) return;
+      if (drag) {
+        var h = ptr.hist, a = h[0], b = h[h.length - 1], v = 0;
+        if (a && b[0] > a[0] && e.timeStamp - b[0] < 80) v = (b[1] - a[1]) / (b[0] - a[0]) * 1000;   // カード何枚／秒
+        v = Math.max(-10, Math.min(10, v));
+        drag = false; view.classList.remove("is-drag");
+        var to = reduce ? p : p + v * (0.1 + 0.6 * RING.inertia);  // inertia が大きいほど遠くまで流れる
+        if (!reduce) vel = v;
+        goTo(RING.snap ? Math.round(to) : to);
+        setTimeout(function () { moved = false; }, 60);
+        ptr = null; poke(); return;
+      }
+      ptr = null; update();
+    }
+    view.addEventListener("pointerup", release);
+    view.addEventListener("pointercancel", release);
+    view.addEventListener("dragstart", function (e) { e.preventDefault(); });
+    // 横方向のホイール（トラックパッドの左右）だけで回す。縦のホイールはページのスクロールにまかせる
+    view.addEventListener("wheel", function (e) {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      if (!wheeling) { wheeling = true; target = null; vel = 0; update(); }
+      p += (e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX) / unit;
+      render(); clearTimeout(wheelT);
+      wheelT = setTimeout(function () { wheeling = false; goTo(RING.snap ? Math.round(p) : p); poke(); }, 160);
+    }, { passive: false });
+    // ドラッグのあとのクリックは無視。中央以外のパネルは、押すとそのパネルが中央へ
+    view.addEventListener("click", function (e) {
+      if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; return; }
+      var a = e.target.closest(".ring__card");
+      if (!a || a.classList.contains("is-front")) return;
+      e.preventDefault();
+      slots.forEach(function (s) { if (s.el === a) goTo(s.k); });
+      poke();
+    }, true);
+
+    /* ボタン（前へ／次へ／一時停止）と、輪の中に focus があるときのキー（左右の矢印で 1 枚、スペースで一時停止の切り替え。
+       ボタンの上のスペースは、そのボタンを押す標準の動きのまま） */
+    $("ring-prev").addEventListener("click", function () { step(-1); });
+    $("ring-next").addEventListener("click", function () { step(1); });
+    ring.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); step(e.key === "ArrowLeft" ? -1 : 1); }
+      else if (e.key === " " && !e.target.closest("button") && !playBtn.hidden) { e.preventDefault(); playBtn.click(); }
+    });
+    playBtn.addEventListener("click", function () {
+      userPaused = !userPaused;
+      playBtn.classList.toggle("is-paused", userPaused);
+      playBtn.setAttribute("aria-label", userPaused ? "自動回転を再生" : "自動回転を止める");
+      idleUntil = 0; update();
+    });
+    if (userPaused) playBtn.classList.add("is-paused");
+
+    /* 止める条件：カードの上にマウス／キーボードの focus が中／画面外／裏のタブ */
+    view.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") { hover = true; update(); } });
+    view.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") { hover = false; update(); } });
+    ring.addEventListener("focusin", function (e) { var v = true; try { v = e.target.matches(":focus-visible"); } catch (er) {} focused = v; update(); });
+    ring.addEventListener("focusout", function (e) { if (!ring.contains(e.relatedTarget)) { focused = false; update(); } });
+    document.addEventListener("visibilitychange", update);
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { inView = es[0].isIntersecting; update(); }).observe(view);
+      new IntersectionObserver(function (es, o) {
+        if (!es[0].isIntersecting) return;
+        seen = true; o.disconnect(); render();
+      }, { rootMargin: "400px 0px" }).observe(view);
+    } else { inView = seen = true; }
+    var rsT;
+    addEventListener("resize", function () { clearTimeout(rsT); rsT = setTimeout(function () { layout(); render(); }, 120); });
+    layout(); build(); update();
+  })();
+
   /* ---------- 読み込み時 ---------- */
   if ($("hero-title")) {
     fitTitle();

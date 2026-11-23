@@ -101,18 +101,21 @@
     <div class="inner">
       <div class="sec-head rv"><h2 class="sec-head__en grad-text" style="--len:6">NURSES</h2><div class="sec-head__side"><p class="sec-head__jp">ナース紹介</p><p class="sec-head__code mono">// NURSE_KARTE</p></div><i class="sec-head__line"></i></div>
       <div class="cast">
-        <figure class="cast__fig rv">
-          <div class="floor" aria-hidden="true"></div>
-          <img src="img/pickup.webp" alt="SuccubusClinicのナースたち（仮の画像）" width="2560" height="1280" loading="lazy" decoding="async">
-          <ul class="cast__tags" aria-hidden="true">
-            <li style="--x:14%;--c:#b7aee6">NURSE 01</li>
-            <li style="--x:31%;--c:#a9dcff">NURSE 02</li>
-            <li style="--x:48%;--c:#ff9cc6">NURSE 03</li>
-            <li style="--x:67.5%;--c:#e3b48e">NURSE 04</li>
-            <li style="--x:83%;--c:#b49af0">NURSE 05</li>
-          </ul>
-          <p class="cast__hud mono" aria-hidden="true"><b>◉</b> PICK UP // 05 OF {{CASTN}}</p>
-        </figure>
+        <!-- ナースの壁（見る人を囲むように内側へ曲がる立体のカルーセル）。パネルは site.js が assets/cast.js から作る。JS が動かないときは出さない -->
+        <div class="ring rv" id="ring" role="group" aria-roledescription="carousel" aria-label="ナース紹介" hidden>
+          <div class="ring__view" id="ring-view">
+            <div class="ring__spin" id="ring-spin"></div>
+          </div>
+          <div class="ring__bar">
+            <p class="ring__now" id="ring-now" aria-live="polite" aria-atomic="true"></p>
+            <div class="ring__ctrl" id="ring-ctrl">
+              <button class="ring__btn --prev" type="button" id="ring-prev" aria-label="前のナース">{{ARROW}}</button>
+              <p class="ring__count" id="ring-count"></p>
+              <button class="ring__btn --next" type="button" id="ring-next" aria-label="次のナース">{{ARROW}}</button>
+              <button class="ring__btn --play" type="button" id="ring-play" aria-label="自動回転を止める"><i aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
         <div class="cast__info glass rv">
           <div>
             <p class="cast__label mono">NURSE KARTE</p>

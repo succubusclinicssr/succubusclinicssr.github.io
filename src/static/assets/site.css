@@ -2848,3 +2848,56 @@ a.qrow:hover .qrow__box::after, a.qrow:focus-visible .qrow__box::after { opacity
   .board, .hero__dlg { border-image-width: 16rem 22rem 18rem 96rem; }
   .ticket, .bcard, .about__card, .rule, .ahero, .box.glass, .gl__doc, .rota, .article.glass { border-image-width: 22rem; }
 }
+
+/* ---------- 9. トップの NURSES：ナースの壁（見る人を囲むように内側へ曲がる立体のカルーセル） ----------
+   平らな写真のパネルを、見る人を軸にした円弧（内向き）に並べる。中央のパネルがいちばん奥で小さく、左右ほど手前で大きい。
+   寸法（--w 幅／--h 高さ／--r 半径／--a となりとの角度／--persp 遠近／--rad 角の丸み／--ref 映りこみ）は site.js の設定（RING）から計算して入れる。
+   左右へ行くほど白くかすませる（--hz。背景は暗くしない）。舞台は画面の左右いっぱい。はみ出しは切る */
+.ring[hidden] { display: none; }
+.maids { overflow-x: clip; }   /* 舞台を画面の左右いっぱいに出すぶん（スクロールバーの幅）で横スクロールが出ないように */
+.ring { --w: 277rem; --h: 414rem; --r: 682rem; --a: 24deg; --persp: 1822rem; --rad: 17rem; --ref: .23; position: relative; }
+.ring__view { position: relative; height: 560rem; margin-inline: calc(50% - 50vw); perspective: var(--persp); perspective-origin: 50% 44%; overflow: hidden; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.ring__view.is-drag { cursor: grabbing; }
+.ring__spin { position: absolute; left: 50%; top: 44%; width: 0; height: 0; transform-style: preserve-3d; transform: rotateX(var(--tilt, 0deg)) translateZ(var(--r)) rotateY(var(--rot, 0deg)); }
+.ring__card { position: absolute; left: calc(var(--w) / -2); top: calc(var(--h) / -2); width: var(--w); height: var(--h); backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  transform: rotateY(calc(var(--i) * var(--a) * -1)) translateZ(calc(var(--r) * -1)); color: var(--ink); text-decoration: none; -webkit-user-drag: none; -webkit-tap-highlight-color: transparent; }
+.ring__card:focus-visible { outline: 3px solid var(--sky-d); outline-offset: 4rem; border-radius: var(--rad); }
+.ring__ph { position: absolute; inset: 0; overflow: hidden; border-radius: var(--rad); background: var(--c, #f4f6fa); }
+.ring__ph::after { content: ""; position: absolute; inset: 0; background: #f8f9fc; opacity: var(--hz, 0); pointer-events: none; }
+.ring__ph img, .ring__ref img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; -webkit-user-drag: none; pointer-events: none; }
+/* 床の映りこみ：同じ写真を上下反転し、下へ向かって消す */
+.ring__ref { position: absolute; left: 0; right: 0; top: calc(100% + 6rem); height: 100%; overflow: hidden; border-radius: var(--rad); background: var(--c, #f4f6fa); transform: scaleY(-1); opacity: calc(var(--ref) * (1 - var(--hz, 0) * 1.6)); pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 62%, #000); mask-image: linear-gradient(180deg, transparent 62%, #000); }
+/* 壁の下：題名（名前）と副題（キャッチコピー）、その下に「‹ 05 / 36 › ■」 */
+.ring__bar { display: flex; flex-direction: column; align-items: center; gap: 10rem; padding: 4rem 0 0; }
+.ring__ctrl { display: flex; align-items: center; justify-content: center; gap: 18rem; }
+.ring__count { min-width: 92rem; text-align: center; font-family: var(--f-en); font-weight: 700; font-size: 16rem; letter-spacing: .14em; color: var(--ink-2); }
+.ring__count b { color: var(--pink-d); font-weight: 700; }
+.ring__now { min-height: 76rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.ring__now-nm { font-weight: 900; font-size: 34rem; line-height: 1.3; letter-spacing: .04em; }
+.ring__now-t { margin-top: 4rem; font-size: 14rem; color: var(--ink-2); }
+.ring__btn { position: relative; display: grid; place-items: center; width: 56rem; height: 56rem; border: 2px solid var(--ink); border-radius: 4rem 14rem 14rem 14rem; background: #fff; color: var(--ink); cursor: pointer;
+  box-shadow: 5rem 5rem 0 var(--hard); transition: transform .2s var(--ease), box-shadow .2s var(--ease), background-color .2s; }
+.ring__btn:hover { background: var(--pink-l); transform: translate(2rem, 2rem); box-shadow: 3rem 3rem 0 var(--hard); }
+.ring__btn:active { transform: translate(5rem, 5rem); box-shadow: none; }
+.ring__btn svg { width: 20rem; height: 15rem; }
+.ring__btn.--prev svg { transform: scaleX(-1); }
+.ring__btn.--play { margin-left: 6rem; width: 38rem; height: 38rem; box-shadow: none; }
+.ring__btn.--play:hover, .ring__btn.--play:active { transform: none; }
+.ring__btn.--play i { width: 12rem; height: 13rem; border-left: 4rem solid var(--ink); border-right: 4rem solid var(--ink); }
+.ring__btn.--play.is-paused i { width: 0; height: 0; border-style: solid; border-width: 7rem 0 7rem 12rem; border-color: transparent transparent transparent var(--pink-d); margin-left: 3rem; }
+.ring__btn[hidden] { display: none; }
+@media (max-width: 768px) {
+  .ring__view { height: 330rem; }
+  .ring__bar { gap: 6rem; }
+  .ring__ctrl { gap: 10rem; }
+  .ring__count { min-width: 72rem; font-size: 14rem; }
+  .ring__now { min-height: 64rem; }
+  .ring__now-nm { font-size: 24rem; }
+  .ring__now-t { font-size: 12rem; }
+  .ring__btn { width: 44rem; height: 44rem; box-shadow: 4rem 4rem 0 var(--hard); }
+  .ring__btn svg { width: 16rem; height: 12rem; }
+  .ring__btn.--play { width: 32rem; height: 32rem; }
+}
+@media (prefers-reduced-motion: reduce) { .ring__btn { transition: none; } }
