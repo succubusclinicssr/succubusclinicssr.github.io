@@ -23,19 +23,31 @@ document.documentElement.classList.add("js");
     return '<div class="th ' + t.cls + '"><span>' + t.t + (t.s ? "<small>" + t.s + "</small>" : "") + "</span></div>";
   }
 
-  /* ---------- トップ：お知らせ ---------- */
+  /* ---------- お知らせの「記入欄」1行（トップとNEWS一覧で共通）----------
+     左にチェック欄、タイトル（罫線の上の答え）、種類（選んだものを丸で囲む。ほかの選択肢は飾りなので読み上げない）、日付欄 */
+  function qrow(n) {
+    var opts = Object.keys(CAT).map(function (k) {
+      var on = k === n.cat;
+      return '<span class="qopt' + (on ? " is-on" : "") + '"' + (on ? "" : ' aria-hidden="true"') + ">" + CAT[k][0] + "</span>";
+    }).join("");
+    return '<a class="qrow --' + n.cat + '" href="' + link(n) + '"><span class="qrow__box" aria-hidden="true"></span><span class="qrow__title">' + esc(n.title) +
+      '</span><span class="qrow__cat">' + opts + '</span><span class="qrow__date">' + n.date + "</span></a>";
+  }
+  /* 空の記入欄（件数が少なくても用紙が埋まって見えるようにする飾り。読み上げ・操作の対象にしない） */
+  function qblank(k) {
+    var h = ""; for (var i = 0; i < k; i++) h += '<span class="qrow --blank"><span class="qrow__box"></span></span>';
+    return k > 0 ? '<div class="qblank" aria-hidden="true">' + h + "</div>" : "";
+  }
+
+  /* ---------- トップ：お知らせ（バインダーにはさんだ用紙＋クリップで留めた添付写真） ---------- */
   var bento = $("news-bento");
   if (bento) {
-    bento.classList.add("--n" + Math.min(NEWS.length, 5));
-    bento.innerHTML = NEWS.slice(0, 5).map(function (n, i) {
-      return '<a class="card rv --' + n.cat + (i === 0 ? " --feature" : "") + '" href="' + link(n) + '"><div class="card__bar"><span class="card__dots"><i></i><i></i><i></i></span><span class="card__cat">' + CAT[n.cat][0] +
-        '</span><span class="card__date">' + n.date + '</span></div><div class="card__thumb">' + thumb(n) + '</div><p class="card__title">' + esc(n.title) + '</p><span class="card__check">OPEN<i>▶</i></span></a>';
-    }).join("");
-    var nl = document.querySelector("#news-list ul");
-    if (nl && NEWS.length <= 5) $("news-list").hidden = true;
-    if (nl) nl.innerHTML = NEWS.slice(5, 8).map(function (n) {
-      return '<li><a href="' + link(n) + '"><time>' + n.date + '</time><span class="cat">' + CAT[n.cat][1] + '</span><span class="t">' + esc(n.title) + "</span>" + ARROW + "</a></li>";
-    }).join("");
+    var TOPN = 5, tops = NEWS.slice(0, TOPN), f = tops[0];
+    bento.innerHTML = '<div class="qboard --top rv"><span class="qboard__clip" aria-hidden="true"></span><div class="qsheet">' +
+      (f ? '<a class="qphoto" href="' + link(f) + '" tabindex="-1" aria-hidden="true"><span class="qphoto__clip"></span><span class="qphoto__img">' + thumb(f) + "</span></a>" : "") +
+      '<div class="qform">' + tops.map(qrow).join("") + qblank(TOPN - tops.length) + "</div></div></div>";
+    // 6件目以降は「VIEW ALL」から（用紙の行にまとめたので、下の文字だけの一覧は使わない）
+    if ($("news-list")) $("news-list").hidden = true;
   }
 
   /* ---------- NEWS一覧：カテゴリとページ送り ---------- */
@@ -53,11 +65,9 @@ document.documentElement.classList.add("js");
       var list = NEWS.filter(function (n) { return cur === "all" || n.cat === cur; }), pages = Math.max(1, Math.ceil(list.length / PER));
       page = Math.min(page, pages);
       [].forEach.call(tabs.children, function (b) { b.setAttribute("aria-selected", b.dataset.cat === cur); });
-      /* ファイル一覧の形：アイコン（サムネイル）・タイトル・種類・日付・OPEN */
-      nlist.innerHTML = list.slice((page - 1) * PER, page * PER).map(function (n) {
-        return '<a class="nfile --' + n.cat + '" href="' + link(n) + '"><span class="nfile__ic">' + thumb(n) + '</span><span class="nfile__name">' + esc(n.title) +
-          '</span><span class="nfile__type"><i></i>' + CAT[n.cat][0] + '</span><span class="nfile__date">' + n.date + '</span><span class="nfile__open">OPEN<i>▶</i></span></a>';
-      }).join("") || '<p class="empty">このカテゴリのお知らせはまだありません。</p>';
+      /* 用紙の記入欄の形：チェック欄・タイトル・種類・日付。1ページ分（PER 行）に足りないぶんは空の記入欄で埋める */
+      var shown = list.slice((page - 1) * PER, page * PER);
+      nlist.innerHTML = (shown.map(qrow).join("") || '<p class="empty">このカテゴリのお知らせはまだありません。</p>') + qblank(PER - Math.max(shown.length, 1));
       var cnt = $("nwin-count"); if (cnt) cnt.textContent = list.length + " 件";
       var h = '<button type="button" class="--prev" aria-label="前のページ" data-p="' + (page - 1) + '"' + (page === 1 ? " disabled" : "") + ">" + ARROW + "</button>";
       for (var p = 1; p <= pages; p++) h += '<button type="button" data-p="' + p + '"' + (p === page ? ' aria-current="page"' : "") + ">" + p + "</button>";
@@ -185,9 +195,9 @@ document.documentElement.classList.add("js");
     (fxLayouts[box.dataset.fx] || []).forEach(function (d, i) {
       var el = document.createElement("i"), kind = d[0], x = d[2], y = d[3];
       var time = "--dur:" + (6 + ((i * 7 + bi * 3) % 5)) + "s;--delay:" + (-((i * 13 + bi * 5) % 7)) + "s";
-      if (kind.indexOf("heart") === 0) {
-        el.className = "px-heart --" + d[1] + (kind === "heart-s" ? " --s" : "");
-      } else {
+      // 背景に浮かぶだけのピクセルハートは、背景を心電図に変えたので出さない（隠れハート探しの .secret-heart とは別物）
+      if (kind.indexOf("heart") === 0) return;
+      {
         el.className = "hud --" + kind.replace("-s", " --s") + " --" + d[1];
         if (kind === "txt") { var txt = HUD_TXT[(bi * 5 + i * 3) % HUD_TXT.length]; el.textContent = txt; el.style.setProperty("--n", txt.length); x = Math.min(x, 74); y = Math.max(y, 12); }
       }
@@ -575,7 +585,7 @@ document.documentElement.classList.add("js");
     /* ---- ハートがはじける ---- */
     function burst(x, y, n, spread) {
       if (reduce) return;
-      var cols = ["#ff9cc6", "#f472a8", "#8fd3ff", "#c9b3f5", "#ffd36e"];
+      var cols = ["#f953c2", "#c8107f", "#00abfc", "#7fd5fe", "#ffd36e"];
       for (var k = 0; k < n; k++) {
         var h = document.createElement("i"), a = Math.random() * Math.PI * 2, d = (spread || 120) * (.4 + Math.random() * .8);
         h.className = "md-pop"; h.style.cssText = "left:" + x + "px;top:" + y + "px;--c:" + cols[k % cols.length] + ";--dx:" + Math.cos(a) * d + "px;--dy:" + (Math.sin(a) * d - 40) + "px;--r:" + (Math.random() * 120 - 60) + "deg;--s:" + (.5 + Math.random() * .8);
@@ -1145,7 +1155,7 @@ document.documentElement.classList.add("js");
   /* 起動演出は最初に開いたときだけ。サイト内の画面遷移でトップに来たときは、帯が抜ける演出だけにする */
   if (!loader || reduce || arrived) { if (loader) loader.classList.add("is-gone"); if (arrived) setTimeout(setReady, 450); else setReady(); }
   else (function () {
-    var hearts = $("ld-hearts"), cols = ["#ff9cc6", "#f472a8", "#8fd3ff", "#c9b3f5", "#ffc2dc"];
+    var hearts = $("ld-hearts"), cols = ["#f953c2", "#c8107f", "#00abfc", "#f953c2", "#7fd5fe"];
     for (var h = 0; h < 14; h++) {
       var hi = document.createElement("i");
       hi.style.cssText = "left:" + ((h * 37 + 7) % 100) + "%;--c:" + cols[h % cols.length] + ";--s:" + (.35 + (h * 13 % 10) / 14) + ";--d:" + (3.2 + (h * 7 % 5) * .55) + "s;--dl:" + (-(h * 0.43) % 4).toFixed(2) + "s;--r:" + ((h * 23 % 40) - 20) + "deg";

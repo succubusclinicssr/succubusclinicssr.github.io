@@ -272,17 +272,17 @@ AC = ' aria-current="page"'
 
 SPRITE = '''<svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <linearGradient id="brim-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff8fc0"/><stop offset=".5" stop-color="#d6a6f2"/><stop offset="1" stop-color="#7ccbff"/></linearGradient>
+    <linearGradient id="brim-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f954c2"/><stop offset=".5" stop-color="#9a6bf4"/><stop offset="1" stop-color="#00abfc"/></linearGradient>
     <symbol id="i-ribbon" viewBox="0 0 100 100">
-      <path d="M50 46 C38 30 12 24 10 40 C8 56 30 62 50 50 C70 62 92 56 90 40 C88 24 62 30 50 46 Z" fill="#ff9cc6" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
-      <path d="M44 52 L32 84 L43 79 L48 90 L50 58 M56 52 L68 84 L57 79 L52 90 L50 58" fill="#8fd3ff" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
-      <circle cx="50" cy="48" r="10" fill="#f472a8" stroke="#fff" stroke-width="5"/>
+      <path d="M50 46 C38 30 12 24 10 40 C8 56 30 62 50 50 C70 62 92 56 90 40 C88 24 62 30 50 46 Z" fill="#fa79d0" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M44 52 L32 84 L43 79 L48 90 L50 58 M56 52 L68 84 L57 79 L52 90 L50 58" fill="#01abfc" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
+      <circle cx="50" cy="48" r="10" fill="#d8158f" stroke="#fff" stroke-width="5"/>
     </symbol>
     <symbol id="i-arrow" viewBox="0 0 16 12"><path d="M1 6h13M9.5 1.5L14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-x" viewBox="0 0 512 512"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></symbol>
-    <symbol id="i-heart" viewBox="0 0 40 36"><path d="M20 34 C7 25 2 18 2 11 C2 5 6 2 11 2 C15 2 18 4 20 8 C22 4 25 2 29 2 C34 2 38 5 38 11 C38 18 33 25 20 34 Z" fill="#ff9cc6" stroke="#2e2a3a" stroke-width="2.4" stroke-linejoin="round"/></symbol>
-    <symbol id="i-vr" viewBox="0 0 40 30"><rect x="2" y="6" width="36" height="20" rx="7" fill="#8fd3ff" stroke="#2e2a3a" stroke-width="2.4"/><circle cx="13" cy="16" r="4.5" fill="#fff" stroke="#2e2a3a" stroke-width="2"/><circle cx="27" cy="16" r="4.5" fill="#fff" stroke="#2e2a3a" stroke-width="2"/><path d="M8 6 C10 2 30 2 32 6" fill="none" stroke="#2e2a3a" stroke-width="2.4"/></symbol>
-    <symbol id="i-cal" viewBox="0 0 36 36"><rect x="3" y="6" width="30" height="27" rx="6" fill="#fff" stroke="#2e2a3a" stroke-width="2.4"/><path d="M3 14h30" stroke="#2e2a3a" stroke-width="2.4"/><path d="M11 3v6M25 3v6" stroke="#2e2a3a" stroke-width="2.4" stroke-linecap="round"/><path d="M18 30 C12 26 10 24 10 21 C10 19 11.5 18 13 18 C14.5 18 15.5 19 18 21 C20.5 19 21.5 18 23 18 C24.5 18 26 19 26 21 C26 24 24 26 18 30 Z" fill="#ff9cc6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 40 36"><path d="M20 34 C7 25 2 18 2 11 C2 5 6 2 11 2 C15 2 18 4 20 8 C22 4 25 2 29 2 C34 2 38 5 38 11 C38 18 33 25 20 34 Z" fill="#fa79d0" stroke="#2a1f4a" stroke-width="2.4" stroke-linejoin="round"/></symbol>
+    <symbol id="i-vr" viewBox="0 0 40 30"><rect x="2" y="6" width="36" height="20" rx="7" fill="#01abfc" stroke="#2a1f4a" stroke-width="2.4"/><circle cx="13" cy="16" r="4.5" fill="#fff" stroke="#2a1f4a" stroke-width="2"/><circle cx="27" cy="16" r="4.5" fill="#fff" stroke="#2a1f4a" stroke-width="2"/><path d="M8 6 C10 2 30 2 32 6" fill="none" stroke="#2a1f4a" stroke-width="2.4"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 36 36"><rect x="3" y="6" width="30" height="27" rx="6" fill="#fff" stroke="#2a1f4a" stroke-width="2.4"/><path d="M3 14h30" stroke="#2a1f4a" stroke-width="2.4"/><path d="M11 3v6M25 3v6" stroke="#2a1f4a" stroke-width="2.4" stroke-linecap="round"/><path d="M18 30 C12 26 10 24 10 21 C10 19 11.5 18 13 18 C14.5 18 15.5 19 18 21 C20.5 19 21.5 18 23 18 C24.5 18 26 19 26 21 C26 24 24 26 18 30 Z" fill="#fa79d0"/></symbol>
   </defs>
 </svg>'''
 
@@ -291,8 +291,24 @@ FONTS = '''<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@700;900&family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="assets/site.css">'''
 
-BG = '''<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
-<div class="gridbg" aria-hidden="true"></div>
+# 背景：病院の壁のような白いタイル（CSSだけで描く）＋ 心電図モニターの波形（ピンクとシアンの2本。動きは site.css）
+# 波形は横1200の座標で、PC用（拍が細かい）とスマホ用（拍が大きい）の2本を持ち、CSSで出し分ける
+ECG_PATHS = {
+    "p": ("M0 60 L20 60 L28 54 L36 60 L52 60 L56 66 L62 14 L68 78 L73 60 L96 60 L108 48 L122 60 L200 60 L220 60 L228 54 L236 60 L252 60 L256 66 L262 18.6 L268 78 L273 60 L296 60 L308 48 L322 60 L400 60 L420 60 L428 54 L436 60 L452 60 L456 66 L462 11.7 L468 78 L473 60 L496 60 L508 48 L522 60 L600 60 L620 60 L628 54 L636 60 L652 60 L656 66 L662 20.9 L668 78 L673 60 L696 60 L708 48 L722 60 L800 60 L820 60 L828 54 L836 60 L852 60 L856 66 L862 14 L868 78 L873 60 L896 60 L908 48 L922 60 L1000 60 L1020 60 L1028 54 L1036 60 L1052 60 L1056 66 L1062 16.3 L1068 78 L1073 60 L1096 60 L1108 48 L1122 60 L1200 60",
+          "M0 60 L40 60 L56 54 L72 60 L104 60 L112 66 L124 14 L136 78 L146 60 L192 60 L216 48 L244 60 L400 60 L440 60 L456 54 L472 60 L504 60 L512 66 L524 18.6 L536 78 L546 60 L592 60 L616 48 L644 60 L800 60 L840 60 L856 54 L872 60 L904 60 L912 66 L924 11.7 L936 78 L946 60 L992 60 L1016 48 L1044 60 L1200 60"),
+    "c": ("M0 60 L24 60 L33.6 54 L43.2 60 L62.4 60 L67.2 66 L74.4 23.2 L81.6 78 L87.6 60 L115.2 60 L129.6 48 L146.4 60 L240 60 L264 60 L273.6 54 L283.2 60 L302.4 60 L307.2 66 L314.4 16.3 L321.6 78 L327.6 60 L355.2 60 L369.6 48 L386.4 60 L480 60 L504 60 L513.6 54 L523.2 60 L542.4 60 L547.2 66 L554.4 25.5 L561.6 78 L567.6 60 L595.2 60 L609.6 48 L626.4 60 L720 60 L744 60 L753.6 54 L763.2 60 L782.4 60 L787.2 66 L794.4 18.6 L801.6 78 L807.6 60 L835.2 60 L849.6 48 L866.4 60 L960 60 L984 60 L993.6 54 L1003.2 60 L1022.4 60 L1027.2 66 L1034.4 20.9 L1041.6 78 L1047.6 60 L1075.2 60 L1089.6 48 L1106.4 60 L1200 60",
+          "M0 60 L60 60 L84 54 L108 60 L156 60 L168 66 L186 20.9 L204 78 L219 60 L288 60 L324 48 L366 60 L600 60 L660 60 L684 54 L708 60 L756 60 L768 66 L786 16.3 L804 78 L819 60 L888 60 L924 48 L966 60 L1200 60"),
+}
+def ecg_lane(k):
+    pc, sp = ECG_PATHS[k]
+    svg = lambda cls: (f'<svg class="ecg__svg {cls}" viewBox="0 0 1200 100" preserveAspectRatio="none">'
+                       f'<path class="--pc" d="{pc}"/><path class="--sp" d="{sp}"/></svg>')
+    # 薄い残像（いつも見えている）→ 左から右へ描かれていく線 → 先頭の光
+    return (f'<div class="ecg__lane --{k}">{svg("ecg__ghost")}'
+            f'<div class="ecg__draw">{svg("ecg__glow")}{svg("ecg__line")}</div><i class="ecg__head"></i></div>')
+
+BG = '''<div class="tilebg" aria-hidden="true"></div>
+<div class="ecg" aria-hidden="true">''' + ecg_lane("p") + ecg_lane("c") + '''</div>
 <div class="cursor" id="cursor" aria-hidden="true"><i></i></div>
 <div class="grain" aria-hidden="true"></div>'''
 
@@ -315,8 +331,8 @@ LOADING = '''<div class="loader" id="loader" aria-hidden="true">
     <div class="loader__core">
       <div class="loader__mark">
         <svg class="loader__ring" viewBox="0 0 200 200"><defs><path id="ld-ring" d="M100 100m-86 0a86 86 0 1 1 172 0a86 86 0 1 1-172 0"/></defs>
-          <circle cx="100" cy="100" r="96" fill="none" stroke="rgba(244,114,168,.45)" stroke-width=".6" stroke-dasharray="2 4"/>
-          <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(78,174,233,.4)" stroke-width=".5"/>
+          <circle cx="100" cy="100" r="96" fill="none" stroke="rgba(216,21,143,.45)" stroke-width=".6" stroke-dasharray="2 4"/>
+          <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(0,119,182,.4)" stroke-width=".5"/>
           <text><textPath href="#ld-ring">SUCCUBUS CLINIC ✦ VR NURSE CAFÉ ✦ WELCOME PATIENT ✦ SUCCUBUS CLINIC ✦ VR NURSE CAFÉ ✦ WELCOME PATIENT ✦</textPath></text></svg>
         <div class="loader__logo"><img src="img/logo-full.webp" alt="" width="1000" height="604"><img class="--a" src="img/logo-full.webp" alt="" width="1000" height="604"><img class="--b" src="img/logo-full.webp" alt="" width="1000" height="604"></div>
       </div>
@@ -348,7 +364,7 @@ def header(cur):
     <ul class="glass">{lis}</ul>
   </nav>
   <a class="h-join" {ext(GROUP_URL)}>JOIN GROUP<i>{ARROW}</i></a>
-  <a class="h-bell glass" href="contact.html" aria-label="受付（お問い合わせ）"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 24h22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M7 21.5a9 9 0 0 1 18 0z" fill="#ff9cc6" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12.5V9.5M13 9.5h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M11.2 18.6a5.4 5.4 0 0 1 3.2-3.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></a>
+  <a class="h-bell glass" href="contact.html" aria-label="受付（お問い合わせ）"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 24h22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M7 21.5a9 9 0 0 1 18 0z" fill="#fa79d0" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12.5V9.5M13 9.5h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M11.2 18.6a5.4 5.4 0 0 1 3.2-3.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></a>
   <a class="h-x glass" {ext(X_URL)} aria-label="{EVENT}のX（{"新しいタブで開く" if X_URL != "#" else TBD}）"><svg viewBox="0 0 512 512" aria-hidden="true"><use href="#i-x"/></svg></a>
   <button class="menu-btn" id="menu-btn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="sp-menu"><span></span><span></span></button>
 </header>
@@ -366,7 +382,7 @@ def win_nav():
     return (f'<a class="h-logo" href="index.html"><img src="img/logo.webp" alt="{EVENT_FULL} トップへ" width="720" height="435"></a>'
             f'<nav class="gnav" aria-label="メインメニュー"><ul>{lis}</ul></nav>'
             f'<a class="h-join" {ext(GROUP_URL)}>JOIN GROUP<i>{ARROW}</i></a>'
-            f'<a class="h-bell glass" href="contact.html" aria-label="受付（お問い合わせ）"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 24h22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M7 21.5a9 9 0 0 1 18 0z" fill="#ff9cc6" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12.5V9.5M13 9.5h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M11.2 18.6a5.4 5.4 0 0 1 3.2-3.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></a><a class="h-x glass" {ext(X_URL)} aria-label="{EVENT}のX（{xl}）"><svg viewBox="0 0 512 512" aria-hidden="true"><use href="#i-x"/></svg></a>')
+            f'<a class="h-bell glass" href="contact.html" aria-label="受付（お問い合わせ）"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 24h22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M7 21.5a9 9 0 0 1 18 0z" fill="#fa79d0" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 12.5V9.5M13 9.5h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M11.2 18.6a5.4 5.4 0 0 1 3.2-3.2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></a><a class="h-x glass" {ext(X_URL)} aria-label="{EVENT}のX（{xl}）"><svg viewBox="0 0 512 512" aria-hidden="true"><use href="#i-x"/></svg></a>')
 
 def footer():
     links = "".join(f'<a href="{k}.html">{en}</a>' for k, en, jp in NAV)
@@ -431,7 +447,7 @@ def head_meta(name, title, desc):
         f'<meta property="og:image" content="{ogimg}">',
         '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">',
         '<meta name="twitter:card" content="summary_large_image">' + (f'<meta name="twitter:site" content="@{esc(X_ID)}">' if X_ID else ""),
-        '<meta name="theme-color" content="#ffe9f3">',
+        '<meta name="theme-color" content="#f4f6fa">',
         '<link rel="icon" href="favicon.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">',
     ]))
 
