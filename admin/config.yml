@@ -1,0 +1,218 @@
+# SuccubusClinic -えすえすあーる- 管理画面（Sveltia CMS）の設定
+# ここで「どんな入力欄があるか」を決めています。入力したデータは content/ に、画像は uploads/ に保存されます。
+backend:
+  name: github
+  repo: OWNER/REPO
+  branch: main
+  commit_messages:
+    create: "{{collection}}を追加: {{slug}}"
+    update: "{{collection}}を更新: {{slug}}"
+    delete: "{{collection}}を削除: {{slug}}"
+    uploadMedia: "画像をアップロード: {{path}}"
+    deleteMedia: "画像を削除: {{path}}"
+
+site_url: SITE_URL
+display_url: SITE_URL
+media_folder: uploads
+public_folder: /uploads
+
+collections:
+  # ------------------------------------------------------------ お知らせ
+  - name: news
+    label: お知らせ
+    label_singular: お知らせ
+    description: トップページとNEWSページに、新しい日付の順に表示されます。保存すると数分でサイトに反映されます。
+    folder: content/news
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: "n{{year}}{{month}}{{day}}{{hour}}{{minute}}"
+    identifier_field: title
+    summary: "{{date}}｜{{title}}"
+    sortable_fields: [date, title]
+    media_folder: /uploads/news
+    public_folder: /uploads/news
+    fields:
+      - { name: title, label: タイトル, widget: string }
+      - { name: date, label: 日付, widget: datetime, time_format: false, format: "YYYY-MM-DD", default: "{{now}}" }
+      - name: category
+        label: カテゴリ
+        widget: select
+        default: info
+        options:
+          - { label: イベント, value: event }
+          - { label: ナース, value: maid }
+          - { label: メニュー, value: menu }
+          - { label: お知らせ, value: info }
+      - name: thumbnail
+        label: サムネイル
+        widget: select
+        default: logo
+        options:
+          - { label: ロゴ, value: logo }
+          - { label: 画像, value: image }
+      - { name: image, label: サムネイル画像, widget: image, required: false, hint: "サムネイルで「画像」を選んだときに使います" }
+      - name: image_pos
+        label: 画像の見せる位置
+        widget: select
+        required: false
+        default: "30%"
+        hint: サムネイルは横長に切り抜かれます。どこを残すかを選べます
+        options:
+          - { label: 上, value: top }
+          - { label: 上寄り, value: "30%" }
+          - { label: 中央, value: center }
+          - { label: 下, value: bottom }
+      - { name: body, label: 本文, widget: markdown, hint: "見出しは「### 」、リンクは [文字](nurses.html) のように書けます" }
+      - { name: draft, label: 下書き, widget: boolean, default: false, required: false, hint: オンにすると、サイトには表示されません }
+
+  # ------------------------------------------------------------ スケジュール
+  - name: schedule
+    label: スケジュール
+    label_singular: 予定
+    description: 通常診療（隔週月曜 21:50〜23:10。2026年12月7日から14日ごと）はカレンダーに自動で入ります。ここでは「特別診療・イベント」の日を増やしたり、診療日を「休診」にしたりできます。こちらの予定が通常診療より優先されます。予定をやめるときは、その予定を削除してください。
+    folder: content/schedule
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: "s{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
+    identifier_field: label
+    summary: "{{date}}｜{{label}}"
+    sortable_fields: [date, label]
+    fields:
+      - { name: date, label: 日付, widget: datetime, time_format: false, format: "YYYY-MM-DD" }
+      - name: type
+        label: 種類
+        widget: select
+        default: special
+        options:
+          - { label: 特別診療・イベント（この日を診療日にする）, value: special }
+          - { label: 休診（この日は診療しない）, value: off }
+      - { name: label, label: カレンダーに出る文字, widget: string, default: 特別診療, hint: "短めに（6文字くらいまで）。例：特別診療／クリスマス／休診" }
+      - { name: start, label: 開始時刻, widget: string, required: false, default: "21:50", hint: 特別診療のときに使います（例 21:00）, pattern: ["^$|^([01]?[0-9]|2[0-9])[:：][0-5][0-9]$", "「21:00」のように半角で入れてください"] }
+      - { name: end, label: 終了時刻, widget: string, required: false, default: "23:10", hint: "日付をまたぐときは 24:30 のように書けます", pattern: ["^$|^([01]?[0-9]|2[0-9])[:：][0-5][0-9]$", "「23:10」のように半角で入れてください"] }
+      - { name: note, label: 説明, widget: text, required: false, hint: SCHEDULEページの「EVENTS」に表示されます（例 クリスマス特別診療！サンタ服のナースがお出迎えします♡） }
+
+  # ------------------------------------------------------------ キャスト
+  - name: cast
+    label: キャスト
+    label_singular: キャスト
+    description: NURSESページ・トップ・おみくじなどに使われます。期生 → 役職（院長・婦長・主任）→ 並び順 の順に並びます。ナースの種類は「設定」で期生ごとに決めます。
+    folder: content/cast
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: "m{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
+    identifier_field: name
+    summary: "{{gen}}期生｜{{name}}"
+    sortable_fields: [gen, name, order]
+    view_groups:
+      - { label: 期生, field: gen }
+    media_folder: /uploads/cast
+    public_folder: /uploads/cast
+    fields:
+      - { name: name, label: 名前, widget: string }
+      - { name: show, label: サイトに表示する, widget: boolean, default: true, hint: 卒業・お休みのときにオフにすると、データを残したまま非表示にできます }
+      - { name: image, label: 立ち絵, widget: image, hint: "背景を透過したPNG（縦長 2:3、例 1023×1537）がおすすめ。サイズは自動で調整されます" }
+      - { name: gen, label: 期生, widget: number, value_type: int, min: 0, default: 1, hint: "ナースの種類（1期生＝ナース など）は期生から自動で決まります。0 にすると「カルテ準備中」" }
+      - name: roles
+        label: 役職・担当
+        widget: select
+        multiple: true
+        required: false
+        hint: ナースの種類は期生から自動で決まるので、ここでは役職と担当だけを選びます
+        options: [院長, 婦長, 主任, シンガー, サブシンガー, ダンサー]
+      - { name: card, label: ローマ字表記, widget: string, required: false, hint: カルテに入る名前（空なら名前をそのまま使います） }
+      - { name: catch, label: キャッチコピー, widget: string, required: false }
+      - { name: bday, label: 生年月日（カルテ）, widget: string, required: false, hint: 例 2月4日 }
+      - { name: from, label: 出身（カルテ）, widget: string, required: false }
+      - { name: blood, label: 血液型（カルテ）, widget: string, required: false }
+      - { name: likes, label: 好物（カルテ）, widget: string, required: false }
+      - { name: skill, label: 得意な処置（カルテ：特技）, widget: string, required: false }
+      - { name: color, label: イメージカラー（うすい色）, widget: color, required: false, hint: 空なら立ち絵から自動で決まります }
+      - { name: color2, label: イメージカラー（こい色）, widget: color, required: false, hint: 空なら立ち絵から自動で決まります }
+      - { name: order, label: 並び順, widget: number, value_type: int, required: false, default: 9999, hint: 同じ期生・同じ役職のなかで、小さい数字ほど前に並びます }
+
+  # ------------------------------------------------------------ 動画
+  - name: movies
+    label: 動画
+    label_singular: 動画
+    description: MEDIAページの動画一覧に、公開日の新しい順で並びます。サムネイルはYouTubeから自動で取り込みます。
+    folder: content/movies
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: "v{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
+    identifier_field: url
+    summary: "{{tag}}｜{{title}}{{url}}"
+    sortable_fields: [date, title]
+    fields:
+      - { name: url, label: YouTubeのURL, widget: string, pattern: ["(youtu\\.be/|youtube\\.com/)", "YouTubeのURLを入れてください"] }
+      - { name: title, label: タイトル, widget: string, required: false, hint: 空ならYouTubeの動画タイトルを自動で使います }
+      - name: tag
+        label: タグ
+        widget: select
+        default: cover
+        options:
+          - { label: ショート, value: short }
+          - { label: PV, value: pv }
+          - { label: 配信, value: live }
+          - { label: 歌ってみた, value: cover }
+      - { name: cast, label: 出演ナース, widget: relation, collection: cast, value_field: name, search_fields: [name], display_fields: [name], required: false }
+      - { name: date, label: 公開日, widget: datetime, time_format: false, format: "YYYY-MM-DD", default: "{{now}}", required: false, hint: 新しい日付ほど前に並びます }
+      - { name: order, label: 並び順, widget: number, value_type: int, required: false, default: 10, hint: 公開日が同じ（または空）のとき、小さい数字ほど前に並びます }
+
+  # ------------------------------------------------------------ 集合写真
+  - name: photos
+    label: 集合写真
+    label_singular: 集合写真
+    description: トップのスライドと、NURSES・MEDIAページのギャラリーに使われます。
+    folder: content/photos
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: "photo{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
+    identifier_field: title
+    summary: "{{order}}｜{{title}}"
+    sortable_fields: [order, title]
+    media_folder: /uploads/photos
+    public_folder: /uploads/photos
+    fields:
+      - { name: title, label: 名前（管理用）, widget: string }
+      - { name: image, label: 写真, widget: image, hint: 背景を透過したPNGがおすすめ。トップでは横長（2:1）に自動で切り抜かれます }
+      - { name: alt, label: 写真の説明, widget: string, required: false, hint: 画像が読めないときや読み上げで使われます（例 SuccubusClinicのナースたち（左から…）） }
+      - { name: order, label: 並び順, widget: number, value_type: int, default: 999, hint: 小さい数字ほど前（トップのスライド・ギャラリー共通） }
+      - { name: hero, label: トップのスライドに出す, widget: boolean, default: true }
+      - { name: gallery, label: ギャラリー（NURSES・MEDIA）に出す, widget: boolean, default: true }
+      - name: hero_pos
+        label: トップで切り抜くときに残す位置
+        widget: select
+        default: top
+        options:
+          - { label: 上（頭を優先）, value: top }
+          - { label: 中央, value: center }
+          - { label: 下, value: bottom }
+
+  # ------------------------------------------------------------ 設定
+  - name: settings
+    label: 設定
+    files:
+      - name: maid_types
+        label: ナースの種類（期生ごと）
+        file: content/settings/maid_types.json
+        format: json
+        fields:
+          - name: types
+            label: 期生ごとの種類
+            hint: カルテ（プロフィール）に表示される、期生ごとのナースの種類です。新しい期生ができたら追加してください
+            label_singular: 期生
+            widget: list
+            summary: "{{gen}}期生：{{name}}"
+            fields:
+              - { name: gen, label: 期生, widget: number, value_type: int, min: 1 }
+              - { name: name, label: 種類の名前, widget: string, hint: 例 研修ナース }

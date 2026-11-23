@@ -1,0 +1,52 @@
+{{PHEAD}}
+
+  <section class="sub-sec">
+    <div class="inner">
+      <p class="phead__lead rv" style="margin:0 auto 40rem;text-align:center">SuccubusClinicのナースたちの写真や動画をまとめています。<br>写真は押すと大きく、動画は押すとYouTubeで再生されます。</p>
+      <nav class="mjump rv" aria-label="ページ内リンク"><a href="#photo"><b>Photo</b><small>写真</small></a><a href="#movie"><b>Movie</b><small>動画</small></a><a href="#share"><b>Share</b><small>みんなの投稿</small></a></nav>
+    </div>
+  </section>
+
+  <section class="sub-sec" id="photo">
+    <div class="inner">
+      <div class="sub-h rv"><b class="neon --p">Photo</b><span>写真（{{PHOTON}}枚）</span><i></i></div>
+      <ul class="media-grid" id="gallery" data-per="8">
+{{GALLERY}}
+      </ul>
+      <nav class="pager" aria-label="写真のページ送り"></nav>
+    </div>
+  </section>
+
+  <section class="sub-sec" id="movie">
+    <div class="inner">
+      <div class="sub-h rv"><b class="neon --c">Movie</b><span>動画（{{MOVIEN}}本）</span><i></i></div>
+      <div class="tabs rv" role="tablist" aria-label="タグで絞り込む" data-filter=".mvlist > li" data-empty="mv-empty">{{MOVIETABS}}</div>
+      <ul class="mvlist">
+{{MOVIES}}
+      </ul>
+      <p class="empty" id="mv-empty" hidden>このタグの動画はまだありません。</p>
+    </div>
+  </section>
+
+  <section class="sub-sec" id="share">
+    <div class="inner">
+      <div class="share rv">
+        <p class="share__label mono">SHARE YOUR PHOTO</p>
+        <p class="share__tag"><code id="m-tag">{{HASHTAG}}</code></p>
+        <p class="share__text">撮った写真は、ハッシュタグ（<b>{{HASHTAG}}</b>）をつけてXに投稿してくださいね♡<br>撮影のルールは準備中です。ほかの方の迷惑にならないようご配慮ください。</p>
+        <div class="btns --center"><a class="btn" {{TAG_LINK}}><span>ハッシュタグを見る</span><i>{{ARROW}}</i></a><button class="btn" type="button" data-copy="m-tag"><span>COPY TAG</span><i>{{ARROW}}</i></button></div>
+      </div>
+    </div>
+  </section>
+
+{{OUT}}
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="写真" hidden>
+    <div class="lightbox__bg" data-lb-close></div>
+    <figure class="lightbox__fig"><img id="lb-img" src="" alt=""><figcaption class="mono" id="lb-cap"></figcaption></figure>
+    <button class="lightbox__close" type="button" data-lb-close aria-label="閉じる"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l10 10M12 2L2 12"/></svg></button>
+    <button class="lightbox__nav --prev" type="button" id="lb-prev" aria-label="前の写真"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L5 7l4 4"/></svg></button>
+    <button class="lightbox__nav --next" type="button" id="lb-next" aria-label="次の写真"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l4 4-4 4"/></svg></button>
+  </div>
+{{/OUT}}
+
+  {{BACK}}

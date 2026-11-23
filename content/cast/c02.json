@@ -1,0 +1,17 @@
+{
+  "name": "ナースB",
+  "show": true,
+  "image": "/uploads/cast/c02.webp",
+  "gen": 1,
+  "roles": [],
+  "card": "NURSE B",
+  "catch": "仮のキャッチコピー",
+  "bday": "1月1日",
+  "from": "仮",
+  "blood": "",
+  "likes": "",
+  "skill": "",
+  "color": "#d9f9ff",
+  "color2": "#2ef2ff",
+  "order": 20
+}

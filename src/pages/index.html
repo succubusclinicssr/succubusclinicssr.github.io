@@ -1,0 +1,223 @@
+<!-- ===== KEY VISUAL（1画面のポスター：左に縦書きのネオン管タイトルとシステム表示、中央に多角形フレームの主役、右に角かっこナビと VITAL MONITOR）
+       主役：集合写真（管理画面の「集合写真」でトップに出すもの）があれば写真のスライド、1枚もなければネオン看板のコラージュ ===== -->
+  <section class="kv {{KV_MODE}}" id="kv" aria-labelledby="kv-title">
+    <canvas class="kv__noise" id="kv-noise" aria-hidden="true"></canvas>
+    <div class="kv__stage" id="hero">
+      <p class="kv__brand mono"><svg aria-hidden="true"><use href="#m-devil"/></svg><span>SUCCUBUSCLINIC <b>-えすえすあーる-</b></span><i>//VRC NURSE CAFÉ EVENT</i></p>
+
+      <h1 class="kv__title" id="kv-title" aria-label="{{EVENT_FULL}}">
+        <span class="kv__board --a" aria-hidden="true"><span class="kv__tate --a" style="--n:{{KV_N_A}}">{{KV_TATE_A}}</span></span>
+        <span class="kv__board --b" aria-hidden="true"><span class="kv__tate --b" style="--n:{{KV_N_B}}">{{KV_TATE_B}}</span></span>
+      </h1>
+
+      <div class="kv__sys mono" role="group" aria-label="システム表示">
+        <p>//SYSTEM STATUS: <b id="sys-status">ONLINE</b></p>
+        <p>//NEXT CLINIC: <b><span id="hn-date">12.07</span> <span id="hn-wd">MON</span> <span id="hn-time">21:50</span></b></p>
+        <p>//TIME: <b id="jst-clock">--:--:--</b> JST</p>
+        <svg class="kv__sysline" viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 19H262L280 1H300"/></svg>
+      </div>
+
+      <div class="kv__fig" id="hero-fig">
+        <svg class="kv__deco" viewBox="-80 -60 980 860" preserveAspectRatio="none" aria-hidden="true">
+          <path class="kv__blk" d="M-30 130L130 -30M-10 150L150 -10"/>
+          <path class="kv__blk --s" d="M842 688l40-40M842 716l40-40"/>
+          <path class="kv__stripes" d="M616 -20l14-14h10l-14 14zM638 -20l14-14h10l-14 14zM660 -20l14-14h10l-14 14zM682 -20l14-14h56l-14 14z"/>
+          <path class="kv__line --hero" d="M150 0H226L238 -12L250 0H262L274 -12L286 0H590L612 22H820V240L800 260V560L820 580V700H330L300 670H40V560L0 520V150Z"/>
+          <path class="kv__line --hair" d="M-12 470V145L145 -12H420M832 600V712H560"/>
+          <path class="kv__line --tick" d="M836 300v220M846 300v24M846 400v24M846 496v24"/>
+        </svg>
+        <div class="kv__frame">
+          <div class="kv__slides" id="hero-slides">
+{{HERO_SLIDES}}
+          </div>
+          <p class="kv__cap mono" aria-hidden="true">CAM_01 // NEXT <span data-next>12.07 MON</span> 21:50 JST</p>
+        </div>
+        <div class="kv__pager" aria-label="写真の切り替え" role="group">
+          <div class="kv__plate"><span class="mono">IMG</span><b class="mono"><span id="hero-no">01</span>/<span id="hero-total">01</span></b></div>
+          <button class="kv__arr" type="button" id="hero-prev" aria-label="前の写真"><svg viewBox="0 0 22 12" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <span class="kv__ticks" id="hero-dots"></span>
+          <button class="kv__arr --next" type="button" id="hero-next" aria-label="次の写真"><svg viewBox="0 0 22 12" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <svg class="kv__hazard" aria-hidden="true"><use href="#d-stripe"/></svg>
+          <i class="kv__bar" id="hero-bar" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <nav class="kv__nav --top" aria-label="メインメニュー">
+        <p class="kv__navh mono" aria-hidden="true">&gt;&gt;NAVIGATION <span>//MENU</span></p>
+        <ul class="mono">{{KV_NAV_TOP}}</ul>
+      </nav>
+
+      <aside class="kv__hud hud" data-frame="hud" aria-label="バイタルモニター（次回の診療日まで）">
+        <div class="hud__head mono"><span>VITAL MONITOR <b>//SC-01</b></span><span class="hud__pc">PCVR ONLY</span></div>
+        <div class="hud__body" aria-hidden="true">
+          <ul class="hud__tiles">
+            <li><svg><use href="#m-cross"/></svg></li><li><svg><use href="#m-capsule"/></svg></li><li><svg><use href="#m-heart"/></svg></li>
+          </ul>
+          <svg class="hud__emblem"><use href="#m-reticle"/></svg>
+          <div class="hud__ecg">{{ECG_LONG}}<p class="mono">PATIENT_ID: <b>YOU</b></p></div>
+        </div>
+        <div class="hud__count mono" aria-live="off">
+          <span class="hud__lab">NEXT CLINIC IN</span>
+          <span class="hud__num"><b id="hc-d">0</b><small>D</small><b id="hc-h">00</b><small>:</small><b id="hc-m">00</b><small>:</small><b id="hc-s">00</b></span>
+        </div>
+        <button class="btn --primary hud__first" type="button" id="open-about" data-open-about aria-haspopup="dialog"><span><small class="mono">[FIRST VISIT]</small>はじめての方へ</span><i>{{ARROW}}</i></button>
+      </aside>
+
+      <nav class="kv__nav --bottom" aria-label="ご案内とリンク">
+        <p class="kv__navh mono" aria-hidden="true">&gt;&gt;GUIDE <span>//ACCESS</span></p>
+        <ul class="mono">{{KV_NAV_BOT}}</ul>
+      </nav>
+
+      <p class="kv__scroll mono" aria-hidden="true"><i></i>SCROLL</p>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <p>//WELCOME PATIENT <i>✚</i> 隔週月曜 21:50 開院 <i>✚</i> PCVR ONLY <i>✚</i> SUCCUBUSCLINIC -えすえすあーる- <i>✚</i> 今夜のときめき、処方します <i>✚</i> </p>
+      <p>//WELCOME PATIENT <i>✚</i> 隔週月曜 21:50 開院 <i>✚</i> PCVR ONLY <i>✚</i> SUCCUBUSCLINIC -えすえすあーる- <i>✚</i> 今夜のときめき、処方します <i>✚</i> </p>
+    </div>
+  </div>
+
+  <!-- ===== NEWS（左：最新の1件／右：一覧、または開院までの小パネル） ===== -->
+  <section class="sec news" id="news">
+    <div class="inner">
+      {{HX:News|お知らせ|LATEST_INFO|01}}
+      <div class="news__grid" id="news-bento"></div>
+    </div>
+  </section>
+
+  {{BAND:ruler|SEC.02 // ABOUT — 病院案内|WORLD: {{WORLD}} // PCVR ONLY}}
+
+  <!-- ===== ABOUT ===== -->
+  <section class="sec about" id="about">
+    <div class="inner">
+      {{HX:About|病院案内|CLINIC_GUIDE|02|r}}
+      <div class="about__grid">
+        <div class="about__txt fr --l rv" data-frame="l">
+          <p class="about__hi">いらっしゃいませ、患者さま！</p>
+          <p class="about__lead">SuccubusClinicへようこそ！</p>
+          <div class="about__text">
+            <p>SuccubusClinic -えすえすあーる-は、サキュバスたちがナースとして働くコンカフェ「SuccubusClinic」をテーマにした、VRChatのイベントです。隔週月曜日の夜、ちょっぴり小悪魔なナースたちが患者さまをお席へご案内し、元気になれる“処方メニュー”をお届けします♡</p>
+            <p>SuccubusClinicはPCVR限定のイベントです（デスクトップ・Quest／Android からはご参加いただけません）。VRChatを始めたばかりの方・イベントがはじめての方も歓迎です！</p>
+          </div>
+          <p class="about__diag mono" aria-hidden="true">DIAGNOSIS: <b>かわいい</b> // CARE_LEVEL <b>████░</b> MAX</p>
+        </div>
+        <figure class="about__visual rv">{{ABOUT_VIS}}<figcaption class="mono" aria-hidden="true">IMG {{PHOTON}} // WARD_PHOTO</figcaption></figure>
+        <div class="about__hours rv" role="img" aria-label="診療時間 21時50分から23時10分（隔週月曜日・日本時間）">
+          <p aria-hidden="true"><span class="mono">CLINIC HOURS</span><b class="mono">21:50–23:10</b><small>隔週月曜・JST</small></p>
+        </div>
+        <div class="about__flow fr --3 rv">
+          <p class="about__side-h"><span class="tag">FLOW</span><b>ご来院の流れ</b></p>
+          <ol class="flow2" aria-label="ご来院の流れ"><li><b>01</b><span>受付</span></li><li><b>02</b><span>ご来院</span></li><li><b>03</b><span>問診</span></li><li><b>04</b><span>処方</span></li><li><b>05</b><span>お大事に</span></li></ol>
+          <div class="btns"><button class="btn --primary" type="button" data-open-about aria-haspopup="dialog"><span>FIRST VISIT</span><i>{{ARROW}}</i></button><a class="btn --line" href="about.html"><span>MORE</span><i>{{ARROW}}</i></a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{BAND:ecg|VITAL ♡ 72BPM|//PATIENT_ID: YOU}}
+
+  <!-- ===== NURSES（ナースの ID カード） ===== -->
+  <section class="sec maids" id="maids">
+    <div class="inner">
+      {{HX:Nurses|ナース紹介|NURSE_KARTE|03}}
+      <div class="cast">
+        <ul class="cast__ids">
+{{CAST_IDS}}
+        </ul>
+        <div class="cast__info fr rv">
+          <p class="cast__label"><span class="tag">KARTE</span><span class="mono">NURSE ON DUTY</span></p>
+          <p class="cast__num mono" aria-label="{{CASTN}}名"><b>{{CASTN}}</b><small>NURSES</small></p>
+          <p class="cast__lead">サキュバスのナースたちが在籍予定！</p>
+          <p class="cast__text">ちょっぴり小悪魔なナースたちが、患者さまをお出迎えします♡ カードを押すとカルテが見られます。</p>
+          <a class="btn --primary" href="nurses.html"><span>VIEW ALL NURSES</span><i>{{ARROW}}</i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{BAND:ruler|SEC.04 // SCHEDULE — 診療時間|EVERY OTHER MON // 21:50–23:10 JST}}
+
+  <!-- ===== SCHEDULE ===== -->
+  <section class="sec schedule" id="schedule">
+    <div class="inner">
+      {{HX:Schedule|診療時間|CLINIC_HOURS|04}}
+      <div class="sbento">
+        <div class="ticket fr --l rv" data-frame="l">
+          <div class="ticket__head mono"><span>PATIENT CARD // NEXT VISIT</span><span class="tag">SC-CARD</span></div>
+          <p class="ticket__date mono" id="t-date">12.07<small>MON</small></p>
+          <p class="ticket__time mono">21:50 — 23:10 JST</p>
+          <div class="count mono" aria-live="polite">
+            <div><b id="cd-d">0</b><span>DAYS</span></div><div><b id="cd-h">00</b><span>HOURS</span></div><div><b id="cd-m">00</b><span>MIN</span></div><div><b id="cd-s">00</b><span>SEC</span></div>
+          </div>
+          <div class="syr" aria-hidden="true"><span class="mono">DOSE</span><span class="syr__tube"><i class="syr__fill" id="syr-fill"></i></span><span class="mono" id="syr-pct">--%</span></div>
+          <p class="ticket__note" id="t-note"><strong>21:50</strong> になったら会場へ！<br>会場・参加方法は準備中です（公式Xで発表予定）。</p>
+          <svg class="ticket__code" aria-hidden="true"><use href="#d-bars"/></svg>
+        </div>
+        <div class="bcard fr --3 b-upcoming rv"><p class="bcard__label"><span class="tag">UPCOMING</span><b>これからの診療日</b></p><ul class="upcoming mono" id="upcoming"></ul></div>
+        <div class="bcard fr b-spec rv"><p class="bcard__label"><span class="tag">INFO</span><b>診療のご案内</b></p>
+          <dl class="spec">
+            <div><dt>DAY</dt><dd>隔週月曜日（2026年12月7日スタート／一部特別診療の場合あり）</dd></div>
+            <div><dt>TIME</dt><dd><span class="num">21:50 – 23:10</span>（日本時間）</dd></div>
+            <div><dt>WORLD</dt><dd>{{WORLD}}</dd></div>
+            <div><dt>DEVICE</dt><dd>PCVRのみ（デスクトップ・Quest／Android からはご参加いただけません）</dd></div>
+            <div><dt>INSTANCE</dt><dd>準備中</dd></div>
+          </dl>
+        </div>
+      </div>
+      <ol class="steps">
+        <li class="step rv"><span class="ntag">01</span><h3>受付</h3><p>会場や参加方法は準備中です。<br>決まりしだい公式Xでお知らせします</p></li>
+        <li class="step rv"><span class="ntag">02</span><h3>ご来院</h3><p>21:50になったら会場へお越しください！</p></li>
+        <li class="step rv"><span class="ntag">03</span><h3>問診～処方</h3><p>小悪魔なナースが患者さまをお出迎え♡<br>元気になれる処方メニューをお届けします！</p></li>
+        <li class="step rv"><span class="ntag">04</span><h3>お大事に</h3><p>23:10ごろにお見送り。<br>最後にナースとごあいさつしましょう！</p></li>
+      </ol>
+      <div class="sec-more rv"><a class="btn --line" href="schedule.html"><span>CALENDAR</span><i>{{ARROW}}</i></a></div>
+    </div>
+  </section>
+
+  {{BAND:ecg|//WARD_GUIDE|RULES 08 // Q&amp;A 12}}
+
+  <!-- ===== GUIDELINES & FAQ ===== -->
+  <section class="sec guide" id="guide">
+    <div class="inner">
+      {{HX:Guidelines|入院のしおり・問診票|WARD_GUIDE|05|r}}
+      <div class="guide__grid">
+        <div class="rules">
+          <div class="rule --ok fr rv"><h3><span class="tag">OK</span>歓迎していること</h3><ul><li>おひとりさまでのご来院</li><li>ナースとのおしゃべり・リアクション</li><li>Xでの感想投稿（ハッシュタグは準備中）</li></ul></div>
+          <div class="rule --ng fr --3 rv"><h3><span class="tag">NG</span>ご遠慮いただくこと</h3><ul><li>ナースやほかの患者さまへの接触・近すぎる距離</li><li>大音量のアバターギミックやパーティクル</li><li>ナースの個人情報や中の人の詮索</li><li>性的な言動や、全年齢向けにふさわしくない話題</li></ul></div>
+        </div>
+        <div class="faq" id="faq">
+          <p class="faq__label rv"><span class="tag">FAQ</span><b>問診票</b></p>
+          <div class="faq__list">
+            <details class="rv"><summary>デスクトップやQuest／Androidからも参加できますか？<i></i></summary><p class="a">SuccubusClinicは<b>PCVR限定</b>のイベントです。デスクトップ・Quest／Android からはご参加いただけません。</p></details>
+            <details class="rv"><summary>VRChatを始めたばかりでも大丈夫ですか？<i></i></summary><p class="a">はい。VRChatを始めたばかりの方・イベントがはじめての方も歓迎です！</p></details>
+            <details class="rv"><summary>どんな雰囲気のイベントですか？<i></i></summary><p class="a">サキュバスたちがナースとして働くコンカフェ、という設定の全年齢向けイベントです。かわいくて、ちょっぴり小悪魔な雰囲気をお楽しみください。</p></details>
+            <details class="rv"><summary>ナースとして働いてみたいです。<i></i></summary><p class="a">キャスト募集については準備中です。決まりしだい公式Xでお知らせします。</p></details>
+          </div>
+        </div>
+      </div>
+      <div class="sec-more rv"><a class="btn --primary" href="guidelines.html"><span>GUIDELINES</span><i>{{ARROW}}</i></a><a class="btn --line" href="faq.html"><span>ALL FAQ</span><i>{{ARROW}}</i></a></div>
+    </div>
+  </section>
+
+  {{BAND:ruler|SEC.06 // CONTACT — 受付|X {{X_ID}} // VRCHAT GROUP 準備中}}
+
+  <!-- ===== CONTACT ===== -->
+  <section class="sec group" id="group">
+    <div class="inner">
+      {{HX:Contact|受付・リンク|RECEPTION|06}}
+      <a class="group__banner rv" {{GROUP_LINK}}>
+        <p class="group__small mono">&gt;&gt;VRCHAT GROUP <span>// STATUS: 準備中</span></p>
+        <p class="group__logo">SUCCUBUSCLINIC</p>
+        <p class="group__copy">グループに入ると診療日のお知らせが届きます（グループは準備中）。</p>
+        <span class="group__cta">VRChatグループに参加する<i>{{ARROW}}</i></span>
+        <svg class="group__rt" aria-hidden="true"><use href="#m-reticle"/></svg>
+      </a>
+      <div class="followlinks rv">
+        <div class="follow fr"><span class="f-ic" aria-hidden="true"><svg viewBox="0 0 512 512"><use href="#i-x"/></svg></span><div><p>最新情報・出勤表・ご質問</p><code id="x-id">{{X_ID}}</code></div><span class="f-btns"><button type="button" data-copy="x-id">COPY</button><a class="f-btn" {{X_LINK}}>FOLLOW</a></span></div>
+        <div class="follow fr"><span class="f-ic" aria-hidden="true">#</span><div><p>感想はハッシュタグをつけて</p><code id="x-tag">{{HASHTAG}}</code></div><span class="f-btns"><button type="button" data-copy="x-tag">COPY</button></span></div>
+      </div>
+      <div class="sec-more rv"><a class="btn --line" href="contact.html"><span>CONTACT</span><i>{{ARROW}}</i></a></div>
+    </div>
+  </section>
