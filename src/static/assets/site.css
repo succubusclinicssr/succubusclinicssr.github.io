@@ -282,20 +282,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 /* ===== HERO（ボードの前に集合写真が画面いっぱいにはみ出す） ===== */
 .hero { --u: calc(100cqw / 1440); position: relative; container-type: inline-size; overflow: hidden; }
 .hero__wrap { position: relative; z-index: 2; height: calc(1000 * var(--u)); }
-/* .board は見出しの位置を決めるだけの箱（枠・ガラスの塗りはなし） */
-.board { position: absolute; z-index: 1; left: calc(110 * var(--u)); right: calc(110 * var(--u)); top: calc(140 * var(--u)); bottom: calc(-80 * var(--u)); overflow: hidden; }
 
 /* 写真より前に出るHUD（ボードの上辺に重ねる） */
 
 .pcvr { padding: 1rem 10rem; border-radius: 999px; background: var(--grad); color: #fff; letter-spacing: .16em; }
-/* 大きな文字（固定・ボードの中） */
-.hero__title { position: absolute; z-index: 2; left: calc(40 * var(--u)); right: calc(40 * var(--u)); top: calc(66 * var(--u)); height: calc(150 * var(--u)); margin: 0; animation: rgb 7s steps(1) infinite; }
-@keyframes rgb { 0%, 91%, 100% { transform: none; } 92% { transform: translate(3rem, -1rem) skewX(-2deg); } 93% { transform: translate(-4rem, 1rem); } 94% { transform: none; } 96% { transform: translate(2rem, 0) skewX(3deg); } 97% { transform: none; } }
-.hero__title .lines { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; }
-.hero__title .lines--sp { display: none; }
-.fit { display: block; width: max-content; white-space: nowrap; font-family: var(--f-en); font-weight: 800; line-height: .86; letter-spacing: -.005em; color: var(--ink); font-size: 200px; filter: drop-shadow(-2px 0 rgba(249,84,194,.55)) drop-shadow(2px 0 rgba(0,171,252,.55)); }
-.fit .o { color: transparent; -webkit-text-stroke: 2px var(--ink); }
-.fit .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .03em; }
 /* 集合写真（ボードの前・画面いっぱい） */
 .hero__fig { position: absolute; z-index: 3; left: 50%; bottom: calc(-262 * var(--u)); width: calc(1520 * var(--u)); translate: -50% 0; pointer-events: none; will-change: transform; }
 .hero__slides { position: relative; aspect-ratio: 2000 / 1271; animation: scanIn 1.2s .2s var(--ease) both, breathe 6s 1.5s ease-in-out infinite alternate; }
@@ -607,11 +597,7 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
   /* hero */
   .hero { --u: calc(100cqw / 390); }
   .hero__wrap { height: calc(660 * var(--u)); }
-  .board { left: calc(14 * var(--u)); right: calc(14 * var(--u)); top: calc(78 * var(--u)); bottom: calc(-40 * var(--u)); }
 
-  .hero__title { left: calc(18 * var(--u)); right: calc(18 * var(--u)); top: calc(50 * var(--u)); height: calc(150 * var(--u)); }
-  .hero__title .lines--pc { display: none; } .hero__title .lines--sp { display: flex; }
-  .fit .o { -webkit-text-stroke-width: 1.2px; }
   .hero__fig { width: calc(620 * var(--u)); bottom: calc(-48 * var(--u)); }
 
   /* news */
@@ -1141,7 +1127,7 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
 .km { --km-a: color-mix(in srgb, var(--c, #fcb0e3) 40%, #f954c2); --km-b: color-mix(in srgb, var(--c2, var(--c, #9a6bf4)) 45%, #7046d6); --km-off: color-mix(in srgb, var(--c, #fff4fb) 22%, #f4eff7);
   display: grid; gap: 12rem; margin-top: 20rem; padding: 14rem 0 4rem; border-top: 1px solid var(--hair); }
 .km[hidden] { display: none; }
-.km__sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+.km__sr, .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 .km__item { display: grid; grid-template-columns: 58rem minmax(0, 1fr) 46rem; grid-template-areas: "k bar n" ". ends ."; column-gap: 12rem; row-gap: 5rem; align-items: center; }
 .km__k { grid-area: k; font-weight: 700; font-size: 13rem; line-height: 1.3; letter-spacing: .06em; color: var(--ink); }
 .km__n { grid-area: n; justify-self: end; font-family: var(--f-head); font-weight: 900; font-size: 26rem; line-height: 1; letter-spacing: 0; color: var(--ink); }
@@ -1269,15 +1255,12 @@ html:not(.is-ready) .hero__slides{ animation-play-state: paused; }
 /* ===== HERO：ヘッダーから帯までを1画面に収める ===== */
 .hero { --top: 112rem; --hh: max(600rem, calc(100svh - 120rem)); }
 .hero__wrap { height: var(--hh); }
-.board { top: var(--top); bottom: 0; }
 
-.hero__title { top: calc(58 * var(--u)); }
 .hero__fig { --ft: calc(var(--top) + 58 * var(--u) + 92 * var(--u)); top: var(--ft); bottom: auto; width: min(calc(1520 * var(--u)), calc((var(--hh) - var(--ft)) * 2.45)); }
 
 .hero__pager { bottom: 18rem; }
 @media (max-width: 768px) {
   .hero { --top: 80rem; --hh: clamp(520rem, calc(100svh - 120rem), 760rem); }
-  .hero__title { top: calc(46 * var(--u)); }
   .hero__fig { --ft: calc(var(--top) + 46 * var(--u) + 120 * var(--u)); width: min(calc(640 * var(--u)), calc((var(--hh) - var(--ft)) * 1.75)); }
 
   .hero__pager { bottom: 12rem; }
@@ -1873,9 +1856,6 @@ html { font-size: min(max(calc(100vw / 1440), min(calc(100vw / 1200), 0.8333px))
 html { font-synthesis: none; }
 body { font-family: var(--f-jp); }
 
-/* ヒーローの大きな文字：まるい極太 */
-.fit { font-family: var(--f-disp); font-weight: 900; letter-spacing: .005em; line-height: 1; }
-
 /* ---------- メニュー・ヘッダーのボタン ---------- */
 .gnav a { font-family: var(--f-en); font-weight: 400; font-size: 16rem; letter-spacing: .08em; }
 .gnav a::after { height: 3rem; bottom: -9rem; background: repeating-linear-gradient(90deg, var(--pink-d) 0 6rem, transparent 6rem 9rem); }
@@ -1970,25 +1950,16 @@ body { font-family: var(--f-jp); }
 /* =====================================================================
    HERO：SUCCUBUS CLINIC SYSTEM のウィンドウ
    - パネル上部にタイトルバー（●●● welcome.exe・写真の切り替え・時計）。浮いたラベルと四すみのカギはなし
-   - 大きな文字は1文字ずつタイプ ／ 写真はピクセルのハートが広がって切り替わる
+   - 写真はピクセルのハートが広がって切り替わる
    - メンバーズカードは右下の「MEMBERSHIP.exe」（カードが発行口から出てくる）
    - CONTACT はヘッダーの呼び鈴に
    ===================================================================== */
-
-.hero__title { animation: none; }
 .os-dots { display: inline-flex; gap: 6rem; flex: none; }
 .os-dots i { width: 12rem; height: 12rem; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 2px var(--ink); }
 .os-dots i:nth-child(1) { background: #fa79d0; } .os-dots i:nth-child(2) { background: #ffe07a; } .os-dots i:nth-child(3) { background: #01abfc; }
 .bb__sp { flex: 1; }
 .hud-clock { font-family: var(--f-en); font-size: 13rem; letter-spacing: .06em; }
 .hud-clock em { font-style: normal; color: var(--ink); font-variant-numeric: tabular-nums; }
-.hero__title { top: calc(66 * var(--u) + 30rem); }
-
-/* 大きな文字：タイプ ＋ 点滅カーソル */
-.js .hero__title .fit:not(.is-typing):not(.is-typed) { clip-path: inset(0 100% 0 0); }
-.hero__title .fit.is-typing { animation: typeIn var(--td, .9s) steps(var(--n, 12), end) both; }
-@keyframes typeIn { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-.hero__cur { display: inline-block; width: .38em; height: .74em; margin-left: .08em; vertical-align: -.02em; background: var(--pink-d); animation: blink 1s steps(1) infinite; }
 
 /* 写真の切り替え：ピクセルのハートが広がる */
 .hero__slides img.is-in { animation: heartIris 1.05s steps(14) both;
@@ -2007,11 +1978,9 @@ body { font-family: var(--f-jp); }
 
 @media (max-width: 768px) {
   .hud-clock { font-size: 10rem; }
-  .hero__title { top: calc(50 * var(--u) + 22rem); }
 
   .h-bell { width: 40rem; height: 40rem; } .h-bell svg { width: 22rem; height: 22rem; }
 }
-@media (prefers-reduced-motion: reduce) {  .hero__cur { animation: none; } }
 /* ヘッダー右のボタンはつぶれないように（スマホは呼び鈴・X・メニューが並ぶ） */
 .menu-btn, .h-x, .h-bell { flex: none; }
 @media (max-width: 768px) { .h-logo { flex: 0 1 auto; min-width: 0; } .h-logo img { max-width: 100%; height: auto; max-height: 44rem; } }
@@ -2019,7 +1988,6 @@ body { font-family: var(--f-jp); }
 /* =====================================================================
    英字の太さ・大きさ（書体は :root の --f-en / --f-head）
    ===================================================================== */
-.fit { font-family: var(--f-en); font-weight: 800; letter-spacing: -.005em; line-height: .86; }
 .about__bg { font-family: var(--f-en); font-weight: 800; letter-spacing: 0; }
 .gnav a { font-weight: 600; font-size: 19rem; letter-spacing: .08em; }
 .h-join { font-weight: 600; font-size: 16rem; letter-spacing: .16em; }
@@ -2036,7 +2004,7 @@ body { font-family: var(--f-jp); }
 }
 
 /* =====================================================================
-   トップの最初の画面：ウィンドウの枠はなし（見出し・写真・操作部をタイルの上に直接置く）
+   トップの最初の画面：ウィンドウの枠も見出しの文字もなし（写真・操作部をタイルの上に直接置く。h1 は読み上げ用で画面に出さない）
    - PCの広い画面のヘッダーはタイトルバーの見た目（ほかのページと同じ。トップもはじめから出ている）
    - 写真の下（帯の上）に操作部（写真の切り替え・PCVR ONLY・時計）
    ===================================================================== */
@@ -2045,18 +2013,16 @@ body { font-family: var(--f-jp); }
 /* 写真の下の操作部（写真の切り替え・PCVR ONLY・時計）：箱なしで、写真のすぐ下の段（高さ --sh）にタイルの上へ直接置く */
 .board__status { position: absolute; z-index: 8; left: calc(110 * var(--u)); right: calc(110 * var(--u)); bottom: 0; height: var(--sh); display: flex; align-items: center; gap: 14rem; padding: 0 16rem;
   font-family: var(--f-en); font-weight: 600; font-size: 13rem; color: var(--ink); white-space: nowrap; }
-/* 最初の画面の高さ＝写真の下はし＋操作部の段。写真の大きさ・位置は変えない
-   （写真の上はし --ft と幅 max(1520u, 100cqw)・縦横 2:1 は上のルールと同じ式） */
-.hero { --sh: 40rem; }
+/* 写真はヘッダーのすぐ下（上はし --ft0）から。最初の画面の高さ＝写真の下はし＋操作部の段
+   （写真の幅 max(1520u, 100cqw)・縦横 2:1、スマホは幅 660u・縦横 2:1 は上のルールと同じ） */
+.hero { --sh: 40rem; --ft0: 112rem; }
 @media (min-width: 769px) {
-  .page-index .hero { --hh: max(560rem, calc(1000 * var(--u)), calc(var(--top) + 142 * var(--u) + max(760 * var(--u), 50cqw) + var(--sh))); }
-}
-@media (min-width: 1101px) {
-  .page-index .hero { --hh: max(560rem, calc(1000 * var(--u)), calc(var(--top) + 68rem + 120 * var(--u) + max(760 * var(--u), 50cqw) + var(--sh))); }
+  .page-index .hero { --hh: calc(var(--ft0) + max(760 * var(--u), 50cqw) + var(--sh)); }
+  .page-index .hero__fig { --ft: var(--ft0); }
 }
 @media (max-width: 768px) {
-  .hero { --sh: 36rem; }
-  .page-index .hero { --hh: calc(650 * var(--u) + var(--sh)); }
+  .hero { --sh: 36rem; --ft0: 80rem; }
+  .page-index .hero { --hh: calc(var(--ft0) + 330 * var(--u) + var(--sh)); }
   .page-index .hero__fig { bottom: var(--sh); }
 }
 .board__status .hero__pager { position: static; display: flex; align-items: center; gap: 8rem; padding: 0; border-radius: 0; background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
@@ -2083,11 +2049,6 @@ body { font-family: var(--f-jp); }
   .header .gnav ul { gap: 24rem; }
   .header .h-x, .header .h-bell { width: 44rem; height: 44rem; background: #fff; border: 2px solid var(--ink); box-shadow: 2rem 2rem 0 var(--hard); backdrop-filter: none; -webkit-backdrop-filter: none; }
   .header .h-join { height: 44rem; }
-
-  /* トップ：ヘッダーははじめから出す。見出し・写真の位置は、前にあったウィンドウのタイトルバー（高さ 68rem）の分を空けたまま */
-  .page-index .hero { --top: 22rem; }
-  .page-index .hero__title { top: calc(36 * var(--u) + 68rem); }
-  .page-index .hero__fig { --ft: calc(var(--top) + 68rem + 36 * var(--u) + 84 * var(--u)); }
 }
 @media (max-width: 768px) {
   .board__status { left: calc(14 * var(--u)); right: calc(14 * var(--u)); gap: 8rem; padding: 0 10rem; font-size: 10rem; }
@@ -2099,11 +2060,6 @@ body { font-family: var(--f-jp); }
   /* Rajdhani は前の書体より少し横に広いので、メニューの文字を少し小さく */
   .header .gnav a { font-size: 17rem; letter-spacing: .06em; }
 }
-
-/* トップの文字：Hello, World! は左から、消すときは後ろから */
-.hero__title .fit.--hello { align-self: flex-start; }
-.hero__title .fit.is-erasing { animation: typeOut var(--ed, .4s) steps(var(--n, 12), end) both; }
-@keyframes typeOut { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 100% 0 0); } }
 
 /* =====================================================================
    はじめての患者さまへ：OSのダイアログ ／ 閉じるとデスクトップのアイコン「はじめに.txt」
@@ -2166,9 +2122,8 @@ body { font-family: var(--f-jp); }
    見出しと大きな英字・数字：Tomorrow（太いデジタル系）
    Tomorrow は前の書体より横に広いので、大きさをそのぶん小さくしてある
    ===================================================================== */
-.fit, .sec-head__en, .phead__en, .sub-h b, .faq__label b, .modal h2, .about__bg, .cast__num, .ticket__date, .count b,
+.sec-head__en, .phead__en, .sub-h b, .faq__label b, .modal h2, .about__bg, .cast__num, .ticket__date, .count b,
 .group__logo, .concept__no, .cal__head b, .share__tag code, .loader__pct b { font-family: var(--f-head); font-weight: 900; letter-spacing: 0; }
-.fit { line-height: .92; }
 .sec-head__en { font-size: 100rem; line-height: .9; }
 .sub-h b { font-size: 46rem; }
 .faq__label b { font-size: 42rem; }

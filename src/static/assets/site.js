@@ -102,79 +102,17 @@ document.documentElement.classList.add("js");
 
   /* ---------- 文字のデコード演出 ---------- */
   var GLYPH = "ABCDEFGHKLNOPRSTUVXYZ0123456789#*+";
-  var scrBusy = 0, fitPending = false;
   function scramble(root, dur) {
     if (reduce || !root) return;
     dur = dur || 700;
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [], n;
     while ((n = walker.nextNode())) if (n.nodeValue.trim()) nodes.push({ n: n, t: n.__orig || (n.__orig = n.nodeValue) });
-    var start = performance.now(); scrBusy++;
+    var start = performance.now();
     (function frame(now) {
       var p = Math.min(1, (now - start) / dur);
       nodes.forEach(function (o) { var t = o.t, keep = Math.floor(t.length * p), out = t.slice(0, keep); for (var k = keep; k < t.length; k++) out += t[k] === " " ? " " : GLYPH[(Math.random() * GLYPH.length) | 0]; o.n.nodeValue = out; });
-      if (p < 1) requestAnimationFrame(frame); else { nodes.forEach(function (o) { o.n.nodeValue = o.t; }); scrBusy--; if (!scrBusy && fitPending) { fitPending = false; fitTitle(); } }
+      if (p < 1) requestAnimationFrame(frame); else { nodes.forEach(function (o) { o.n.nodeValue = o.t; }); }
     })(start);
-  }
-
-  /* ---------- トップの大きな文字を幅いっぱいに ---------- */
-  /* トップの大きな文字：病院の端末のように1文字ずつタイプされる（最後にカーソル） */
-  function typeTitle() {
-    var longest = 0;
-    document.querySelectorAll("#hero-title .lines").forEach(function (lines) {
-      var t = 0;
-      lines.querySelectorAll(":scope > .fit").forEach(function (f) {
-        if (reduce) { f.classList.add("is-typed"); return; }
-        var n = Math.max(4, f.textContent.length), d = n * 62;
-        f.style.setProperty("--n", n); f.style.setProperty("--td", d + "ms"); f.style.animationDelay = t + "ms";
-        f.classList.remove("is-typing", "is-erasing"); void f.offsetWidth; f.classList.add("is-typing"); t += d + 90;
-      });
-      longest = Math.max(longest, t);
-    });
-    return longest;
-  }
-  /* はじめに「Hello, World!」とタイプ → 少し止まって消す → 「WELCOME TO SUCCUBUS CLINIC」をタイプ */
-  var HELLO = { pc: '<span class="fit --hello">Hello, <span class="g">World!</span><i class="hero__cur"></i></span>',
-                sp: '<span class="fit --hello">Hello,</span><span class="fit --hello"><span class="g">World!</span><i class="hero__cur"></i></span>' };
-  function introTitle() {
-    var t = $("hero-title");
-    if (!t || reduce || root.classList.contains("is-open-now")) { typeTitle(); return; }
-    var groups = [].slice.call(t.querySelectorAll(".lines")), saved = groups.map(function (g) { return g.innerHTML; });
-    fitTitle();
-    var sizes = groups.map(function (g) { return [].map.call(g.querySelectorAll(":scope > .fit"), function (f) { return f.style.fontSize; }); });
-    scrBusy++;   // タイプ中は文字の大きさを測り直さない
-    groups.forEach(function (g, i) {
-      g.innerHTML = g.classList.contains("lines--sp") ? HELLO.sp : HELLO.pc;
-      [].forEach.call(g.querySelectorAll(":scope > .fit"), function (f, k) { f.style.fontSize = sizes[i][Math.min(k, sizes[i].length - 1)]; });
-    });
-    var tHello = typeTitle();
-    setTimeout(function () {
-      var tErase = 0;
-      groups.forEach(function (g) {
-        var t2 = 0;
-        [].slice.call(g.querySelectorAll(":scope > .fit")).reverse().forEach(function (f) {
-          var n = Math.max(4, f.textContent.length), d = n * 30;
-          f.style.setProperty("--n", n); f.style.setProperty("--ed", d + "ms"); f.style.animationDelay = t2 + "ms";
-          f.classList.remove("is-typing", "is-typed"); void f.offsetWidth; f.classList.add("is-erasing"); t2 += d + 40;
-        });
-        tErase = Math.max(tErase, t2);
-      });
-      setTimeout(function () {
-        groups.forEach(function (g, i) { g.innerHTML = saved[i]; });
-        scrBusy--; fitPending = false; fitTitle(); typeTitle();
-      }, tErase + 140);
-    }, tHello + 950);
-  }
-  function fitTitle() {
-    if (scrBusy > 0) { fitPending = true; return; }
-    document.querySelectorAll("#hero-title .lines").forEach(function (lines) {
-      if (getComputedStyle(lines).display === "none") return;
-      var W = lines.clientWidth, H = lines.clientHeight; if (!W) return;
-      var fits = lines.querySelectorAll(":scope > .fit"), sizes = [];
-      fits.forEach(function (f) { f.style.fontSize = "100px"; sizes.push(100 * W / (f.offsetWidth || 1)); });
-      fits.forEach(function (f, k) { f.style.fontSize = sizes[k] + "px"; });
-      var total = 0; fits.forEach(function (f) { total += f.offsetHeight; });
-      if (total > H) { var r = H / total; fits.forEach(function (f, k) { f.style.fontSize = (sizes[k] * r) + "px"; }); }
-    });
   }
 
   /* ---------- 背景の演出 ----------
@@ -233,9 +171,8 @@ document.documentElement.classList.add("js");
     hero.addEventListener("pointermove", function (e) {
       var r = hero.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
       fig.style.transform = "translate(" + (x * 22) + "px," + (y * 10) + "px)";
-      $("hero-title").style.translate = (-x * 12) + "px " + (-y * 8) + "px";
     });
-    hero.addEventListener("pointerleave", function () { fig.style.transform = ""; $("hero-title").style.translate = ""; });
+    hero.addEventListener("pointerleave", function () { fig.style.transform = ""; });
   }
 
   /* ---------- カーソルの光 ---------- */
@@ -1062,7 +999,7 @@ document.documentElement.classList.add("js");
     }
 
     /* ---------- 5. 開院モード（診療日の 21:50〜23:10 だけ。特別診療・休診も反映） ---------- */
-    var titleBackup = null, openBadge = null;
+    var openBadge = null;
     function nowOpen() { var n = Date.now(), l = openList(n, 1); return l.length > 0 && l[0] <= n; }
     function checkOpen() {
       var on = nowOpen() || openPreview;
@@ -1074,15 +1011,6 @@ document.documentElement.classList.add("js");
         var hd = document.querySelector(".header"), ref = document.querySelector(".h-join") || document.querySelector(".h-x");
         if (hd) hd.insertBefore(openBadge, ref);
       }
-      var t = $("hero-title"); if (!t) return;
-      var lp = t.querySelector(".lines--pc"), ls = t.querySelector(".lines--sp");
-      if (on) {
-        titleBackup = titleBackup || { pc: lp.innerHTML, sp: ls.innerHTML, label: t.getAttribute("aria-label") };
-        lp.innerHTML = '<span class="fit">CLINIC <span class="g">NOW OPEN</span><i class="hero__cur"></i></span>';
-        ls.innerHTML = '<span class="fit">CLINIC</span><span class="fit"><span class="g">NOW OPEN</span><i class="hero__cur"></i></span>';
-        t.setAttribute("aria-label", "いらっしゃいませ、患者さま（ただいま開院中）");
-      } else if (titleBackup) { lp.innerHTML = titleBackup.pc; ls.innerHTML = titleBackup.sp; t.setAttribute("aria-label", titleBackup.label); }
-      fitTitle(); typeTitle();
     }
     onReady(checkOpen); setInterval(checkOpen, 30000);
 
@@ -1414,12 +1342,6 @@ document.documentElement.classList.add("js");
   })();
 
   /* ---------- 読み込み時 ---------- */
-  if ($("hero-title")) {
-    fitTitle();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitle);
-    var rt; addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(fitTitle, 120); });
-    onReady(function () { setTimeout(introTitle, 250); });
-  }
   var ph = document.querySelector(".phead__en");
   if (ph) setTimeout(function () { scramble(ph, 800); }, 150);
 })();
