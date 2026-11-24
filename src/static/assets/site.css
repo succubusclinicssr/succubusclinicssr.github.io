@@ -57,7 +57,7 @@ main, .footer { position: relative; z-index: 1; overflow-x: clip; }
    壁：無地の白い壁に、左上と右下だけ六角タイル（ハチの巣）のかたまりを SVG で描く。かたまりの外は余白として残す。
    固定の層なのでスクロールしても描き直しが起きない */
 body { background: var(--tile); }
-.tilebg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background-color: var(--tile); }
+.tilebg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background-color: var(--tile); background-image: var(--tile-img); }
 /* 六角タイルのかたまり：build.py の hexwall() が作る SVG。左上用（--l）は画面の左上、右下用（--r）は画面の右はしに付ける。1 単位 = 1rem。
    かたまりの外は無地（.tilebg の色）のまま残す */
 .hexwall { position: absolute; top: 0; display: block; }
@@ -85,7 +85,7 @@ body { background: var(--tile); }
 .hc.--o .f { fill: none; stroke: #2a1f4a; stroke-width: 1.5; }
 .hc.--o .i { stroke: rgba(42,31,74,.35); }
 /* 部屋の明かり：中央を少し明るく、四隅をほんのり青く落とす（タイルの上にかける1枚の静止した層） */
-.tilebg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 30%, rgba(255,255,255,.45), rgba(255,255,255,0) 60%), radial-gradient(140% 120% at 50% 50%, transparent 60%, rgba(120,140,180,.12)); }
+.tilebg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 30%, rgba(255,255,255,.3), rgba(255,255,255,0) 60%), radial-gradient(140% 120% at 50% 50%, transparent 60%, rgba(120,140,180,.06)); }
 
 /* 心電図：波形が左から右へ描かれ、先頭が光る。ピンク（上）とシアン（下）の2本が時間をずらして走る。
    本文の邪魔にならないよう薄く、カードやボードの後ろ（z-index 0）に置く */
@@ -2040,6 +2040,10 @@ body { font-family: var(--f-jp); }
   .page-index .hero { --hh: calc(var(--ft0) + 330 * var(--u) + var(--sh)); }
   .page-index .hero__fig { bottom: var(--sh); }
 }
+/* 写真の下はし（操作部のすぐ上）で体が横一直線に切れて見えないよう、下の 18% を壁へ溶かす。
+   img には切り替えのハートのマスクがあるので、動かない親（.hero__fig）に掛ける（.hero__slides の breathe で写真が上へ動いても、下はしは透明のまま） */
+.page-index .hero__fig { -webkit-mask-image: linear-gradient(180deg, #000 82%, rgba(0,0,0,.92) 85.5%, rgba(0,0,0,.74) 89%, rgba(0,0,0,.48) 92.5%, rgba(0,0,0,.22) 95.5%, rgba(0,0,0,.06) 98.2%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 82%, rgba(0,0,0,.92) 85.5%, rgba(0,0,0,.74) 89%, rgba(0,0,0,.48) 92.5%, rgba(0,0,0,.22) 95.5%, rgba(0,0,0,.06) 98.2%, transparent 100%); }
 .board__status .hero__pager { position: static; display: flex; align-items: center; gap: 8rem; padding: 0; border-radius: 0; background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .board__status .hero__pager .arr { width: 28rem; height: 28rem; border: 2px solid var(--ink); border-radius: 8rem; background: #fff; color: var(--ink); box-shadow: 2rem 2rem 0 var(--hard); }
 .board__status .hero__pager .arr:hover { background: var(--ink); color: #fff; }
@@ -2272,7 +2276,11 @@ body { font-family: var(--f-jp); }
    パソコンのヘッダーは帯から少しはみ出す形（余白をマイナスにして、帯の高さは変えない） */
 .h-logo img { height: 96rem; }
 .f-logo img { height: 132rem; }
-@media (min-width: 1101px) { .header .h-logo img { height: 96rem; margin-block: -24rem; } }
+@media (min-width: 1101px) {
+  /* 枠（高さ 72rem、内側の線は上下 6rem）の内側に文字（画像の高さの約 88%）がおさまる高さ。箱の幅は前の大きさのままにして、ナビの位置を動かさない */
+  .header .h-logo { width: calc(96rem * 720 / 435); display: flex; justify-content: center; }
+  .header .h-logo img { height: 68rem; margin-block: -10rem; }
+}
 @media (max-width: 768px) {
   .h-logo img { height: auto; max-height: 68rem; }
   .f-logo img { height: 104rem; }
@@ -2294,8 +2302,8 @@ body { font-family: var(--f-jp); }
   --hard: rgba(0,171,252,.3);        /* くっきりした影：うすいネオンシアン */
   --hard-pink: rgba(249,83,194,.34); /* 濃い色のボタンの影：うすいネオンピンク */
   --bar-bg: linear-gradient(90deg, rgba(249,83,194,.13), rgba(255,255,255,0) 32% 68%, rgba(0,171,252,.13)), #fff; /* タイトルバー：白地の両はしにネオンの気配 */
-  /* 白い六角タイル 1 周期ぶん（3R × √3R、R=52）。見た目は背景の SVG（build.py の hexwall）の下地と同じ */
-  --tile-img: linear-gradient(145deg, #fbfcfe, #eef2f7);   /* 無地の壁（起動画面と、ページ切り替えの最後の幕） */
+  /* 壁（.tilebg）・起動画面・ページ切り替えの最後の幕：左上うすいピンク → まん中は白に近いラベンダー → 右下うすいシアン */
+  --tile-img: linear-gradient(135deg, #ffe3f4 0%, #f7f4fc 38%, #f2f6fd 60%, #d9f1ff 100%);
 }
 
 /* 見出し（大きな英字）：ネオンピンクの文字に、シアンのずれ影とピンクのやわらかい光 */
@@ -2364,6 +2372,9 @@ body { font-family: var(--f-jp); }
 .loader__wipe i:nth-child(3), .pt__bands i:nth-child(3) { background: linear-gradient(90deg, #4cc6ff, #00abfc); }
 /* ページ切り替え：最後の幕は白いタイル */
 .pt__bands i:nth-child(4) { background: var(--tile-img); background-color: var(--tile); }
+/* 幕は画面の 3 倍の幅（left -100%・top/bottom -20%）なので、グラデーションを画面 1 枚ぶんの大きさで中央に置き、止まったときに壁と同じ色の並びになるように
+   （幕は 18° 傾いていて、画面の上下のはしで左右に 0.325×画面の高さの半分ずれるので、そのぶん横を広げてすき間を出さない） */
+.pt__bands i:nth-child(4) { background-size: calc(100vw + 66vh) 100vh; background-position: 50% 50%; background-repeat: no-repeat; background-color: #f4f4fb; }
 .pt__core img { filter: drop-shadow(0 8rem 16rem rgba(249,83,194,.25)); }
 
 /* 診察券：すみの色のにじみは、ネオンの光がうっすら見える程度に */
@@ -2792,6 +2803,9 @@ a.qrow:hover .qrow__box::after, a.qrow:focus-visible .qrow__box::after { opacity
 .ring { --w: 277rem; --h: 414rem; --r: 682rem; --a: 24deg; --persp: 1822rem; --rad: 17rem; --ref: .23; position: relative; }
 .ring__view { position: relative; height: 560rem; margin-inline: calc(50% - 50vw); perspective: var(--persp); perspective-origin: 50% 44%; overflow: hidden; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+/* 舞台の下のはし（床の映りこみが切れる所）は、映りこみが消えきっていなくても、ここで必ず透明になるようにする（左右の消し方と重ねる） */
+.ring__view { -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent), linear-gradient(180deg, #000 88%, rgba(0,0,0,.4) 95%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent), linear-gradient(180deg, #000 88%, rgba(0,0,0,.4) 95%, transparent); -webkit-mask-composite: source-in; mask-composite: intersect; }
 .ring__view.is-drag { cursor: grabbing; }
 .ring__spin { position: absolute; left: 50%; top: 44%; width: 0; height: 0; transform-style: preserve-3d; transform: rotateX(var(--tilt, 0deg)) translateZ(var(--r)) rotateY(var(--rot, 0deg)); }
 .ring__card { position: absolute; left: calc(var(--w) / -2); top: calc(var(--h) / -2); width: var(--w); height: var(--h); backface-visibility: hidden; -webkit-backface-visibility: hidden;
@@ -2802,7 +2816,7 @@ a.qrow:hover .qrow__box::after, a.qrow:focus-visible .qrow__box::after { opacity
 .ring__ph img, .ring__ref img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; -webkit-user-drag: none; pointer-events: none; }
 /* 床の映りこみ：同じ写真を上下反転し、下へ向かって消す */
 .ring__ref { position: absolute; left: 0; right: 0; top: calc(100% + 6rem); height: 100%; overflow: hidden; border-radius: var(--rad); background: var(--c, #f4f6fa); transform: scaleY(-1); opacity: calc(var(--ref) * (1 - var(--hz, 0) * 1.6)); pointer-events: none;
-  -webkit-mask-image: linear-gradient(180deg, transparent 62%, #000); mask-image: linear-gradient(180deg, transparent 62%, #000); }
+  -webkit-mask-image: linear-gradient(180deg, transparent 70%, rgba(0,0,0,.3) 82%, rgba(0,0,0,.7) 92%, #000); mask-image: linear-gradient(180deg, transparent 70%, rgba(0,0,0,.3) 82%, rgba(0,0,0,.7) 92%, #000); }
 /* 壁の下：題名（名前）と副題（キャッチコピー）、その下に「‹ 05 / 36 › ■」 */
 .ring__bar { display: flex; flex-direction: column; align-items: center; gap: 10rem; padding: 4rem 0 0; }
 .ring__ctrl { display: flex; align-items: center; justify-content: center; gap: 18rem; }
@@ -2838,3 +2852,49 @@ a.qrow:hover .qrow__box::after, a.qrow:focus-visible .qrow__box::after { opacity
 
 /* トップの袖看板（PC の広い画面）：はじめから出ているヘッダーに隠れないよう、ヘッダーのすぐ下に下げる */
 @media (min-width: 1101px) { .page-index .csign { top: 108rem; } }
+
+/* ---------- 大きいピンクの英字見出し（下層のタイトル・トップの各セクション）：太めのピクセル書体 Pixelify Sans 700 ----------
+   Pixelify Sans は Tomorrow より大文字が低く（0.64em ↔ 0.74em）、幅もせまい。文字の高さが前と同じになるよう大きさを 1.156 倍にし、
+   枠の高さ・文字の上下の位置も前と同じになるよう、行の高さと上下の余白をこの書体に合わせる（左右の余白は前と同じ px 幅）。
+   行の高さを em で決めているので、書体が読みこまれる前の代わりの書体でも枠の高さは変わらない */
+.sec-head__en, .phead__en, .sec-head__en.grad-text, .phead__en.grad-text { --tube: 0 0 5rem rgba(249,83,194,.28);
+  font-family: "Pixelify Sans", var(--f-head); font-weight: 700; letter-spacing: 0; line-height: .9; padding: .138em .294em .06em calc(.294em + 22rem); }
+.sec-head__en { font-size: calc(100rem * 1.156); }
+.phead__en { font-size: calc(112rem * 1.156); }
+@media (max-width: 768px) {
+  .sec-head__en, .phead__en { font-size: min(calc(56rem * 1.156), calc(280rem * 1.156 / (var(--len, 8) * .78))); }
+}
+
+/* ---------- 背景の六角タイルの動き（目印は build.py の hexwall()。画面に入る 1 周期目だけ） ----------
+   動かすのは opacity・transform・心電図の線の stroke-dashoffset だけ。どれも周期の大半は値が止まっている
+   ・光の波（.hx-gl）：10 秒ごとに、画面の左上から右下へ、タイルが順に薄く灯って消える（遅れ --d は位置から）
+   ・マーク（.hx-mk）：ハートは鼓動（1.4 秒）、心電図は線が消えて描き直される（4.6 秒）、しずくはぽたっと落ちて戻る（5.2 秒）、十字は明るさがゆらぐ（6.4 秒）
+   ・色つきタイルのツヤ（.hx-sh）：8 秒ごとに、ゆっくり薄くなって戻る
+   マークとツヤは --r（0〜1）で周期の中の位置をずらし、となり同士が同時に動かないようにする */
+.hexwall .hx-gl { opacity: 0; pointer-events: none; animation: hxWave 10s var(--d, 0s) infinite; }
+@keyframes hxWave { 0%, 100% { opacity: 0; } 3% { opacity: .5; } 7.5% { opacity: 0; } }
+.hexwall .hx-mk { transform-box: fill-box; transform-origin: center; }
+.hexwall .hx-mk.--heart { animation: hxBeat 1.4s calc(var(--r, 0) * -1.4s) infinite; }
+@keyframes hxBeat {
+  0%, 40%, 100% { transform: scale(1); animation-timing-function: ease-out; }
+  9% { transform: scale(1.16); animation-timing-function: ease-in; }
+  18% { transform: scale(1.02); animation-timing-function: ease-out; }
+  26% { transform: scale(1.1); animation-timing-function: ease-in; }
+}
+.hexwall .hx-mk.--pulse { stroke-dasharray: 42 42; animation: hxTrace 4.6s calc(var(--r, 0) * -4.6s) infinite linear; }
+@keyframes hxTrace { 0%, 56% { stroke-dashoffset: 0; } 70% { stroke-dashoffset: -42; } 70.01% { stroke-dashoffset: 42; } 90%, 100% { stroke-dashoffset: 0; } }
+.hexwall .hx-mk.--drop { animation: hxDrip 5.2s calc(var(--r, 0) * -5.2s) infinite; }
+@keyframes hxDrip {
+  0%, 62%, 100% { transform: none; opacity: 1; }
+  72% { transform: translateY(1.5px) scaleY(1.06); opacity: 1; animation-timing-function: ease-in; }
+  80% { transform: translateY(6px); opacity: 0; }
+  80.01% { transform: translateY(-4px); opacity: 0; animation-timing-function: ease-out; }
+  90% { transform: none; opacity: 1; }
+}
+.hexwall .hx-mk.--cross { animation: hxGlim 6.4s calc(var(--r, 0) * -6.4s) infinite ease-in-out; }
+@keyframes hxGlim { 0%, 45%, 100% { opacity: 1; } 65% { opacity: .5; } 80% { opacity: 1; } }
+.hexwall .hx-sh { animation: hxSheen 8s calc(var(--r, 0) * -8s) infinite ease-in-out; }
+@keyframes hxSheen { 0%, 50%, 100% { opacity: 1; } 72% { opacity: .2; } 88% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .hexwall .hx-gl, .hexwall .hx-mk, .hexwall .hx-sh { animation: none; }
+}

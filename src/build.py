@@ -416,7 +416,7 @@ SPRITE = '''<svg width="0" height="0" style="position:absolute" aria-hidden="tru
 
 FONTS = '''<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@700;900&family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@700;900&family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;700&family=Pixelify+Sans:wght@700&display=swap">
 <link rel="stylesheet" href="assets/site.css">'''
 
 # 背景：病院の壁のような白いタイル（CSSだけで描く）＋ 心電図モニターの波形（ピンクとシアンの2本。動きは site.css）
@@ -477,6 +477,9 @@ def hexwall(kind):
             + grad("gv", "#c58af2", "#a651e4", 'x2="0" y2="1"')
             + f'<linearGradient id="{p}-gs" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".3"/>'
               f'<stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>'
+            # 光の波：タイルに重ねる薄い光（白 → ピンク → シアン。濃さは site.css の .hx-gl の動きで）
+            + f'<linearGradient id="{p}-w" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#ffe2f5"/>'
+              f'<stop offset="1" stop-color="#d2f0ff"/></linearGradient>'
             + f'<path id="{p}-h" d="{hexd(R - 1)}"/><path id="{p}-i" d="{hexd(R - 7)}"/>'
             # 目地：タイルより少し大きい六角を下に敷く（となり同士のあいだと、かたまりのふちに目地の色が出る）
             + f'<path id="{p}-b" d="{hexd(R + .5)}" fill="#d5dce7"/>'
@@ -485,27 +488,40 @@ def hexwall(kind):
               f'<path d="M{n(-a)} 0L{n(-a/2)} {n(-ah)}H{n(a/2)}" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
               f'<path d="M{n(-b/2)} {n(bh)}H{n(b/2)}L{n(b)} 0" fill="none" stroke="rgba(120,138,172,.16)" stroke-width="2" stroke-linejoin="round"/></g>'
             + "".join(f'<g id="{p}-{k}" transform="translate(0 {n(my)}){f" scale({n(ms)})" if ms != 1 else ""}">{d}</g>' for k, d in HEX_MARK.items()))
-    def cells(tiles, fx, par):                # fx：列 → 中心の x、par：半段下がる列（1 奇数／0 偶数）
+    # 動き（site.css の .hx-gl / .hx-mk / .hx-sh）の目印。動かすのは画面に入る 1 周期目だけ（2 周期目は止めたまま）
+    #   光の波：画面の左上から右下へ、ななめの位置（x＋y。右下用は画面の右はしに付くので、設計幅との差 ox を足す）に応じて遅らせる
+    #   マーク・ツヤ：黄金比で散らした割合 --r（0〜1）を CSS で周期にかけて、となり同士が同時に動かないようにする
+    ox, wk = (1440 - W, .0019) if pc else (390 - W, .0037)
+    seq = [0]
+    def rnd():
+        seq[0] += 1
+        return f"{(seq[0] * .618034) % 1:.2f}"
+    def cells(tiles, fx, par, off):           # fx：列 → 中心の x、par：半段下がる列（1 奇数／0 偶数）、off：光の波の位置のずれ
         back, face = [], []
         for i in range(2):                    # 2 周期ぶん
             for c, r, k, *rest in tiles:
                 m = rest[0] if rest else ""
                 t = rest[1] if len(rest) > 1 else ""
-                x, y = n(fx(c)), n(rs * (r + i * period + (.5 if c % 2 == par else 0)))
+                xv, yv = fx(c), rs * (r + i * period + (.5 if c % 2 == par else 0))
+                x, y = n(xv), n(yv)
+                live = i == 0
+                gl = (f'<use href="#{p}-h" class="hx-gl" fill="url(#{p}-w)" style="--d:{(xv + off + yv) * wk:.2f}s"' if live else "")
                 back.append(f'<use href="#{p}-b" x="{x}" y="{y}"/>')
                 if k == "w":
-                    face.append(f'<use href="#{p}-t" x="{x}" y="{y}"/>')
+                    face.append(f'<use href="#{p}-t" x="{x}" y="{y}"/>' + (f'{gl} x="{x}" y="{y}"/>' if live else ""))
                     continue
                 tile = f'<use href="#{p}-t"/>' if k == "o" else ""
-                shine = f'<use href="#{p}-h" fill="url(#{p}-gs)"/>' if k in ("p", "c", "v", "k") else ""
+                sh = f' class="hx-sh" style="--r:{rnd()}"' if live else ""
+                shine = f'<use href="#{p}-h" fill="url(#{p}-gs)"{sh}/>' if k in ("p", "c", "v", "k") else ""
                 fill = f' fill="url(#{p}-g{k})"' if k in ("p", "c", "v") else ""   # 塗りのグラデーションは属性で指定（CSS の url() は使わない）
                 txt = f'<text y="{n(R * .33)}">{esc(t)}</text>' if pc and t else ""
+                mk = f' class="hx-mk --{m}" style="--r:{rnd()}"' if live else ""
                 face.append(f'<g class="hc --{k}" transform="translate({x} {y})">{tile}<use href="#{p}-h" class="f"{fill}/>{shine}'
-                            f'<use href="#{p}-i" class="i"/><use href="#{p}-{m}"/>{txt}</g>')
+                            f'<use href="#{p}-i" class="i"/><use href="#{p}-{m}"{mk}/>{txt}{gl + "/>" if live else ""}</g>')
         return "".join(back) + "".join(face)  # 目地を先にぜんぶ敷いてから、タイルをのせる
     box = f'viewBox="0 0 {W} {n(H)}"'
-    return (f'<svg class="hexwall --{kind} --l" {box}><defs>{defs}</defs>' + cells(left, lambda c: 1.5 * R * c, 1) + "</svg>"
-            + f'<svg class="hexwall --{kind} --r" {box}>' + cells(right, lambda c: rx0 - 1.5 * R * c, rpar) + "</svg>")
+    return (f'<svg class="hexwall --{kind} --l" {box}><defs>{defs}</defs>' + cells(left, lambda c: 1.5 * R * c, 1, 0) + "</svg>"
+            + f'<svg class="hexwall --{kind} --r" {box}>' + cells(right, lambda c: rx0 - 1.5 * R * c, rpar, ox) + "</svg>")
 
 BG = '''<div class="tilebg" aria-hidden="true">''' + hexwall("pc") + hexwall("sp") + '''</div>
 ''' + WALL + '''
