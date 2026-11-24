@@ -40,6 +40,134 @@ def warn(msg):
     WARN.append(msg); print("⚠ " + msg, file=sys.stderr)
 esc = lambda t: _html.escape(str(t or ""), quote=True)
 
+# ---------------------------------------------------------------- 背景の六角タイル：ハチの巣のかたまりの並べ方（絵の組み立ては下の hexwall()、色は site.css の .hc）
+#   壁ぜんぶを六角にはせず、画面の左上と右下にだけ六角のかたまりを置き、あいだは無地のまま残す。
+#   かたまりは、わざと不ぞろいにする：色つきを散らし、ところどころ 1 枚ぬいて穴をあける（行の番号がとんでいる所が穴）。
+#   1行＝1枚：(列, 行, 種類, マーク, 文字)。1枚足すときは1行足し、消すときは1行消すだけ。
+#   列は「画面のはし」から数える（_L は左はしから、_R は右はしから。0 がいちばん外）。行は上から。どちらも 0 から。
+#   となりの列とは半段ずつずれてかみ合う（ハチの巣の並び）。
+#   種類：w 白いタイル（マークも文字もなし。見出しなどの文字の下に来てもじゃまにならない）
+#         p ピンク / c シアン / v むらさき / k 紺紫（ここまで塗り）、pp うすいピンク / cp うすいシアン、o 白いタイルに線の枠
+#   マーク：heart ハート / cross 十字 / pulse 心電図 / drop しずく
+#   文字：NURSE CALL / HEART RATE / TOKIMEKI / SSR / CLINIC（PC だけ。スマホは文字を出さないので書かない）
+#   PC は 16 行、スマホは 20 行ごとに、同じ並びが下へくり返される（縦に長い画面用）。
+#   見出しやパンくずの文字が通る所（左上の内側）は w だけにしてある。紺紫（k）は文字が読めなくなるので、いちばん外の列だけ。
+HEX_PC_L = [
+    # 左上：左はしの列に色つき（行 2 は穴）、内側は白いタイル（パンくずの所は穴）
+    (0, 0, "c",  "drop",  "SSR"),
+    (0, 1, "p",  "heart", "NURSE CALL"),
+    (0, 3, "k",  "pulse", "HEART RATE"),
+    (0, 4, "pp", "drop",  "TOKIMEKI"),
+    (1, 1, "w"),
+    (1, 2, "w"),
+    (1, 4, "cp", "pulse", "CLINIC"),
+    (1, 5, "pp", "cross", "SSR"),
+    (2, 1, "w"),
+    (2, 3, "w"),
+    (2, 4, "w"),
+    (3, 1, "w"),
+    (3, 2, "w"),
+    (4, 1, "w"),
+    (4, 2, "w"),
+    (5, 1, "w"),
+    # 少し離れて飛ぶタイル
+    (7, 1, "w"),
+]
+HEX_PC_R = [
+    # 右下（列 0 の行 5〜7 は、壁の照準と警告ラベルの場所なので空けてある）
+    (0, 8,  "p",  "pulse", "SSR"),
+    (0, 9,  "k",  "cross", "TOKIMEKI"),
+    (0, 11, "p",  "heart", "NURSE CALL"),
+    (0, 12, "pp", "cross", "HEART RATE"),
+    (0, 14, "cp", "drop",  "CLINIC"),
+    (0, 15, "o",  "pulse", "TOKIMEKI"),
+    (1, 4,  "w"),
+    (1, 5,  "o",  "cross", "SSR"),
+    (1, 6,  "p",  "heart", "CLINIC"),
+    (1, 8,  "v",  "drop",  "HEART RATE"),
+    (1, 9,  "pp", "cross", "TOKIMEKI"),
+    (1, 10, "c",  "pulse", "SSR"),
+    (1, 12, "cp", "drop",  "CLINIC"),
+    (1, 13, "w"),
+    (2, 5,  "w"),
+    (2, 6,  "pp", "pulse", "NURSE CALL"),
+    (2, 7,  "o",  "drop",  "HEART RATE"),
+    (2, 8,  "c",  "heart", "TOKIMEKI"),
+    (2, 10, "p",  "cross", "CLINIC"),
+    (2, 11, "o",  "heart", "NURSE CALL"),
+    (2, 12, "w"),
+    (3, 6,  "cp", "cross", "SSR"),
+    (3, 7,  "w"),
+    (3, 8,  "pp", "heart", "CLINIC"),
+    (3, 9,  "c",  "drop",  "NURSE CALL"),
+    (3, 11, "w"),
+    (4, 6,  "o",  "heart", "TOKIMEKI"),
+    (4, 7,  "pp", "drop",  "SSR"),
+    (4, 9,  "o",  "pulse", "HEART RATE"),
+    (4, 10, "pp", "cross", "TOKIMEKI"),
+    (4, 11, "w"),
+    (5, 6,  "w"),
+    (5, 8,  "p",  "heart", "NURSE CALL"),
+    (5, 9,  "w"),
+    (5, 10, "cp", "pulse", "CLINIC"),
+    (6, 7,  "cp", "drop",  "SSR"),
+    (6, 9,  "o",  "cross", "CLINIC"),
+    (6, 10, "w"),
+    (7, 6,  "o",  "pulse", "TOKIMEKI"),
+    (7, 8,  "w"),
+    # 少し離れて飛ぶタイル
+    (8, 10, "w"),
+]
+HEX_SP_L = [
+    # 左上：ロゴのうしろの白いタイル（ところどころ穴）。色つきは、パンくず・見出しの文字と重ならない角とヘッダーのすき間だけ
+    (0, 0, "cp", "heart"),
+    (0, 1, "p",  "cross"),
+    (0, 3, "w"),
+    (0, 4, "w"),
+    (1, 0, "w"),
+    (1, 2, "w"),
+    (1, 3, "w"),
+    (2, 0, "w"),
+    (2, 1, "w"),
+    (2, 3, "w"),
+    (3, 0, "w"),
+    (3, 1, "w"),
+    (4, 1, "w"),
+    (5, 0, "cp", "drop"),
+]
+HEX_SP_R = [
+    # 右下
+    (0, 11, "pp", "drop"),
+    (0, 12, "k",  "heart"),
+    (0, 13, "p",  "cross"),
+    (0, 15, "v",  "drop"),
+    (0, 16, "pp", "heart"),
+    (0, 18, "o",  "heart"),
+    (1, 9,  "w"),
+    (1, 10, "c",  "heart"),
+    (1, 11, "cp", "pulse"),
+    (1, 13, "pp", "pulse"),
+    (1, 14, "c",  "drop"),
+    (1, 15, "o",  "heart"),
+    (1, 16, "w"),
+    (2, 10, "o",  "drop"),
+    (2, 11, "pp", "heart"),
+    (2, 12, "p",  "cross"),
+    (2, 14, "cp", "cross"),
+    (2, 15, "w"),
+    (3, 10, "w"),
+    (3, 11, "o",  "pulse"),
+    (3, 13, "c",  "drop"),
+    (3, 14, "w"),
+    (4, 11, "w"),
+    (4, 12, "pp", "cross"),
+    (4, 14, "o",  "heart"),
+    (5, 12, "w"),
+    (5, 13, "cp", "pulse"),
+    # 少し離れて飛ぶタイル
+    (6, 14, "w"),
+]
+
 # ---------------------------------------------------------------- データの読み込み
 def load(folder):
     d = os.path.join(CONTENT, folder); out = []
@@ -314,7 +442,72 @@ WALL = '''<div class="wall" aria-hidden="true">
   <span class="wall__warn --c">心拍上昇注意</span>
 </div>'''
 
-BG = '''<div class="tilebg" aria-hidden="true"></div>
+# 背景の六角タイル：左上と右下のかたまり（並べ方は上の HEX_PC_L / _R、HEX_SP_L / _R）を SVG に描く。
+#   かたまりの外は何も描かない（無地の壁がそのまま見える）。1 単位 = 1rem（大きさと置き場所は site.css の .hexwall）
+#   六角は平らな辺が上下にくる向き。R＝外接円の半径。列の間隔 1.5R、行の間隔 √3·R、となりの列は半段ずれる
+HEX_MARK = {   # マーク（大きさ 18 の箱に描いた自作の形）
+    "heart": '<path d="M0 8C-2 6.3-9 1.8-9-3.2-9-6.2-6.8-8-4.5-8-2.6-8-1-6.9 0-5.2 1-6.9 2.6-8 4.5-8 6.8-8 9-6.2 9-3.2 9 1.8 2 6.3 0 8Z" fill="currentColor"/>',
+    "cross": '<path d="M-3-9H3V-3H9V3H3V9H-3V3H-9V-3H-3Z" fill="currentColor"/>',
+    "pulse": '<path d="M-9.5 1H-4.5L-2-6.5 1.5 7.5 4 1H9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+    "drop": '<path d="M0-9C2.6-5 7-1.2 7 3A7 7 0 0 1-7 3C-7-1.2-2.6-5 0-9Z" fill="currentColor"/>',
+}
+def hexwall(kind):
+    # kind は "pc" か "sp"。左上用（--l）と右下用（--r）の 2 枚の SVG を返す。
+    # 形の定義（defs）は左上用の中に 1 回だけ置き、右下用からも使う（2 枚はいつも同時に表示されるので参照できる）
+    pc = kind == "pc"
+    p, R, period, W = ("hwp", 52, 16, 780) if pc else ("hws", 30, 20, 300)
+    left, right = (HEX_PC_L, HEX_PC_R) if pc else (HEX_SP_L, HEX_SP_R)
+    rx0, rpar = (W - 28, 1) if pc else (W + 15, 0)   # 右下用：いちばん外の列の中心の x と、半段下がるのが奇数の列（1）か偶数の列（0）か
+    s3 = 3 ** .5
+    rs = s3 * R                               # 行の間隔
+    H = rs * period * 2                       # 2 周期ぶんの高さ
+    n = lambda v: f"{v:.2f}".rstrip("0").rstrip(".") if abs(v) >= .005 else "0"   # 小数 2 桁まで
+    def hexd(r):                              # 平らな辺が上下の六角（中心 0,0）
+        h = r * s3 / 2
+        return f"M{n(r)} 0L{n(r/2)} {n(h)}H{n(-r/2)}L{n(-r)} 0L{n(-r/2)} {n(-h)}H{n(r/2)}Z"
+    a = R - 2.75; ah = a * s3 / 2             # 面取りの光（目地から 1.5 ほど内側）
+    b = R - 2.15; bh = b * s3 / 2             # 面取りの影
+    grad = lambda i, c1, c2, attr: (f'<linearGradient id="{p}-{i}" {attr}><stop offset="0" stop-color="{c1}"/>'
+                                    f'<stop offset="1" stop-color="{c2}"/></linearGradient>')
+    my, ms = (-R * .22, 1) if pc else (0, 13 / 18)   # マークの高さと大きさ（スマホは文字が無いので中央）
+    defs = (grad("g", "#fdfeff", "#edf1f7", 'x2="1" y2="1"')
+            + f'<radialGradient id="{p}-l" cx=".3" cy=".22" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".9"/>'
+              f'<stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
+            + grad("gp", "#ff8ad6", "#f953c2", 'x2="0" y2="1"') + grad("gc", "#5ccfff", "#00abfc", 'x2="0" y2="1"')
+            + grad("gv", "#c58af2", "#a651e4", 'x2="0" y2="1"')
+            + f'<linearGradient id="{p}-gs" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".3"/>'
+              f'<stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>'
+            + f'<path id="{p}-h" d="{hexd(R - 1)}"/><path id="{p}-i" d="{hexd(R - 7)}"/>'
+            # 目地：タイルより少し大きい六角を下に敷く（となり同士のあいだと、かたまりのふちに目地の色が出る）
+            + f'<path id="{p}-b" d="{hexd(R + .5)}" fill="#d5dce7"/>'
+            # 白いタイル1枚：陶器の面＋ツヤ＋上と左上の光＋下と右下の影
+            + f'<g id="{p}-t"><use href="#{p}-h" fill="url(#{p}-g)"/><use href="#{p}-h" fill="url(#{p}-l)"/>'
+              f'<path d="M{n(-a)} 0L{n(-a/2)} {n(-ah)}H{n(a/2)}" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
+              f'<path d="M{n(-b/2)} {n(bh)}H{n(b/2)}L{n(b)} 0" fill="none" stroke="rgba(120,138,172,.16)" stroke-width="2" stroke-linejoin="round"/></g>'
+            + "".join(f'<g id="{p}-{k}" transform="translate(0 {n(my)}){f" scale({n(ms)})" if ms != 1 else ""}">{d}</g>' for k, d in HEX_MARK.items()))
+    def cells(tiles, fx, par):                # fx：列 → 中心の x、par：半段下がる列（1 奇数／0 偶数）
+        back, face = [], []
+        for i in range(2):                    # 2 周期ぶん
+            for c, r, k, *rest in tiles:
+                m = rest[0] if rest else ""
+                t = rest[1] if len(rest) > 1 else ""
+                x, y = n(fx(c)), n(rs * (r + i * period + (.5 if c % 2 == par else 0)))
+                back.append(f'<use href="#{p}-b" x="{x}" y="{y}"/>')
+                if k == "w":
+                    face.append(f'<use href="#{p}-t" x="{x}" y="{y}"/>')
+                    continue
+                tile = f'<use href="#{p}-t"/>' if k == "o" else ""
+                shine = f'<use href="#{p}-h" fill="url(#{p}-gs)"/>' if k in ("p", "c", "v", "k") else ""
+                fill = f' fill="url(#{p}-g{k})"' if k in ("p", "c", "v") else ""   # 塗りのグラデーションは属性で指定（CSS の url() は使わない）
+                txt = f'<text y="{n(R * .33)}">{esc(t)}</text>' if pc and t else ""
+                face.append(f'<g class="hc --{k}" transform="translate({x} {y})">{tile}<use href="#{p}-h" class="f"{fill}/>{shine}'
+                            f'<use href="#{p}-i" class="i"/><use href="#{p}-{m}"/>{txt}</g>')
+        return "".join(back) + "".join(face)  # 目地を先にぜんぶ敷いてから、タイルをのせる
+    box = f'viewBox="0 0 {W} {n(H)}"'
+    return (f'<svg class="hexwall --{kind} --l" {box}><defs>{defs}</defs>' + cells(left, lambda c: 1.5 * R * c, 1) + "</svg>"
+            + f'<svg class="hexwall --{kind} --r" {box}>' + cells(right, lambda c: rx0 - 1.5 * R * c, rpar) + "</svg>")
+
+BG = '''<div class="tilebg" aria-hidden="true">''' + hexwall("pc") + hexwall("sp") + '''</div>
 ''' + WALL + '''
 <div class="ecg" aria-hidden="true">''' + ecg_lane("p") + ecg_lane("c") + '''</div>
 <div class="cursor" id="cursor" aria-hidden="true"><i></i></div>
