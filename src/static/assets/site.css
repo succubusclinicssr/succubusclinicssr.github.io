@@ -2853,16 +2853,22 @@ a.qrow:hover .qrow__box::after, a.qrow:focus-visible .qrow__box::after { opacity
 /* トップの袖看板（PC の広い画面）：はじめから出ているヘッダーに隠れないよう、ヘッダーのすぐ下に下げる */
 @media (min-width: 1101px) { .page-index .csign { top: 108rem; } }
 
-/* ---------- 大きいピンクの英字見出し（下層のタイトル・トップの各セクション）：太めのピクセル書体 Pixelify Sans 700 ----------
-   Pixelify Sans は Tomorrow より大文字が低く（0.64em ↔ 0.74em）、幅もせまい。文字の高さが前と同じになるよう大きさを 1.156 倍にし、
-   枠の高さ・文字の上下の位置も前と同じになるよう、行の高さと上下の余白をこの書体に合わせる（左右の余白は前と同じ px 幅）。
-   行の高さを em で決めているので、書体が読みこまれる前の代わりの書体でも枠の高さは変わらない */
-.sec-head__en, .phead__en, .sec-head__en.grad-text, .phead__en.grad-text { --tube: 0 0 5rem rgba(249,83,194,.28);
-  font-family: "Pixelify Sans", var(--f-head); font-weight: 700; letter-spacing: 0; line-height: .9; padding: .138em .294em .06em calc(.294em + 22rem); }
-.sec-head__en { font-size: calc(100rem * 1.156); }
-.phead__en { font-size: calc(112rem * 1.156); }
+/* ---------- 大きいピンクの英字見出し（下層のタイトル・トップの各セクション）：書体 Noise Warning ----------
+   Noise Warning-ϗ（騒音警示·改）：Amari_design 作のフリーフォント（個人・商用とも利用可）。ファイルは assets/fonts/noise-warning.ttf。
+   どの文字も 1em × 1em の四角（等幅）で、太さを変えられる（100 ふつう／300 Bold／500 Heavy）。太くするほど四角が塗りつぶされて
+   読みにくくなるので、ここでは 200（やや太め）を使う。光のにじみは、文字の中の細いすき間をつぶさないよう弱くしてある。
+   文字の高さが前の書体（Tomorrow：大文字の高さ 0.74em）と同じになるよう、大きさを 0.74 倍にする。
+   枠の高さは前と同じ（1.27 × もとの大きさ）のまま、文字が枠の上下のまん中に来るよう、行の高さ 1.2（文字はその下の 1em ぶん）と上下の余白を決める。
+   左右の余白は前と同じ幅。行の位置が OS やブラウザで変わらないよう、行の上下の取り方（ascent 120%・descent 0）を固定する */
+@font-face { font-family: "Noise Warning"; src: url("fonts/noise-warning.ttf") format("truetype"); font-weight: 100 500; font-style: normal; font-display: swap;
+  ascent-override: 120%; descent-override: 0%; line-gap-override: 0%; }
+.sec-head__en, .phead__en, .sec-head__en.grad-text, .phead__en.grad-text { --tube: 0 0 4rem rgba(249,83,194,.16);
+  font-family: "Noise Warning", var(--f-head); font-weight: 200; letter-spacing: 0; line-height: 1.2; padding: .158em .459em .358em calc(.459em + 22rem); }
+.sec-head__en { font-size: calc(100rem * .74); }
+.phead__en { font-size: calc(112rem * .74); }
 @media (max-width: 768px) {
-  .sec-head__en, .phead__en { font-size: min(calc(56rem * 1.156), calc(280rem * 1.156 / (var(--len, 8) * .78))); }
+  /* 等幅なので、文字の幅は「文字数 × 大きさ」。長い英字が画面からはみ出さないよう、幅 280rem におさまる大きさにする */
+  .sec-head__en, .phead__en { font-size: min(calc(56rem * .74), calc(280rem / var(--len, 8))); }
 }
 
 /* ---------- 背景の六角タイルの動き（目印は build.py の hexwall()。画面に入る 1 周期目だけ） ----------

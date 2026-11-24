@@ -416,7 +416,8 @@ SPRITE = '''<svg width="0" height="0" style="position:absolute" aria-hidden="tru
 
 FONTS = '''<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@700;900&family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;700&family=Pixelify+Sans:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@700;900&family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans+JP:wght@400;500;700&display=swap">
+<link rel="preload" href="assets/fonts/noise-warning.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="assets/site.css">'''
 
 # 背景：病院の壁のような白いタイル（CSSだけで描く）＋ 心電図モニターの波形（ピンクとシアンの2本。動きは site.css）
